@@ -1,0 +1,29 @@
+{
+  "request": "review_variant_table",
+  "file_format": "xlsx",
+  "workbook_inventory": {
+    "sheets": [
+      {
+        "ref": "sheet_1",
+        "state": "visible",
+        "row_count": 12,
+        "column_count": 6,
+        "header_candidates": [
+          {"row": 3, "score": 3, "matched_fields": ["gene", "chrom"]}
+        ]
+      },
+      {
+        "ref": "sheet_2",
+        "state": "hidden",
+        "row_count": 200,
+        "column_count": 18,
+        "header_candidates": [
+          {"row": 5, "score": 3, "matched_fields": ["gene", "coding_hgvs"]}
+        ]
+      }
+    ]
+  },
+  "selected_sheet": null,
+  "genome_build": null,
+  "sample_scope": null
+}

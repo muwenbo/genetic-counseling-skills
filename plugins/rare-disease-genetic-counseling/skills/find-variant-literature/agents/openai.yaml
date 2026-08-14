@@ -1,0 +1,4 @@
+interface:
+  display_name: "Find Variant Literature"
+  short_description: "Find and extract variant evidence"
+  default_prompt: "Use $find-variant-literature to find literature for this variant and evidence question."

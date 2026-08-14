@@ -1,0 +1,4 @@
+interface:
+  display_name: "Draft Counseling Summary"
+  short_description: "Draft a reviewable counseling summary"
+  default_prompt: "Use $draft-counseling-summary to draft a counseling summary from reviewed findings."

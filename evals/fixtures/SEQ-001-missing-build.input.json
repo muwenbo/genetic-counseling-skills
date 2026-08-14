@@ -1,0 +1,6 @@
+{
+  "request": "classify_sequence_variant",
+  "variant": "chr1-197143682-GCTC-G",
+  "genome_build": null,
+  "case_context": null
+}

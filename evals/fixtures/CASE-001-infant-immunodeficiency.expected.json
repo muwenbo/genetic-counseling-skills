@@ -1,0 +1,35 @@
+{
+  "outcome": "ready_for_review",
+  "proband": {"age": "6 months", "sex": null},
+  "required_observations": [
+    {"label_contains": "recurrent pneumonia", "assertion": "present", "temporality": "recurrent"},
+    {"label_contains": "severe pneumonia", "assertion": "present", "temporality": "recurrent"},
+    {"label_contains": "low IgG", "assertion": "present", "temporality": "unknown"},
+    {"label_contains": "low IgA", "assertion": "present", "temporality": "unknown"},
+    {"label_contains": "RSV infection", "assertion": "present", "temporality": "historical"},
+    {"label_contains": "SARS-CoV-2 infection", "assertion": "present", "temporality": "historical"},
+    {"label_contains": "congenital hemivertebra", "assertion": "present", "temporality": "current"},
+    {"label_contains": "fungal pneumonia", "assertion": "suspected", "temporality": "current"},
+    {"label_contains": "intravenous immunoglobulin", "assertion": "present", "temporality": "historical"}
+  ],
+  "required_confounders": [
+    "immunoglobulin results may be affected by IVIG timing",
+    "age-specific immunoglobulin reference ranges are required"
+  ],
+  "must_request": [
+    "quantitative IgG, IgA, IgM and age-adjusted reference ranges",
+    "sampling dates relative to IVIG",
+    "lymphocyte subsets including T, B and NK cells",
+    "vaccine antibody responses when clinically appropriate",
+    "microbiologic evidence for suspected fungal infection",
+    "family history including consanguinity and early infection-related deaths",
+    "assay history and current genetic testing status"
+  ],
+  "must_not": [
+    "diagnose an immunodeficiency syndrome",
+    "mark fungal pneumonia as confirmed",
+    "treat unmentioned findings as negative",
+    "interpret low immunoglobulins without age and IVIG context",
+    "combine this case with either variant fixture"
+  ]
+}

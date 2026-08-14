@@ -1,0 +1,4 @@
+interface:
+  display_name: "Classify CNV"
+  short_description: "Build a constitutional CNV proposal"
+  default_prompt: "Use $classify-cnv to classify this CNV for qualified human review."

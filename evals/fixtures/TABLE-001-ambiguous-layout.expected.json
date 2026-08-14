@@ -1,0 +1,27 @@
+{
+  "outcome": "blocked",
+  "blocking_reasons": [
+    "variant_sheet_ambiguous",
+    "column_mapping_unreviewed",
+    "genome_build_missing",
+    "sample_scope_missing"
+  ],
+  "must_request": [
+    "reviewer selection of sheet and header row",
+    "reviewed source-to-canonical column mapping",
+    "genome build and coordinate convention",
+    "assay and sample scope"
+  ],
+  "must_preserve": [
+    "both candidate sheets",
+    "hidden-sheet warning",
+    "company annotations as supplied claims",
+    "unresolved nonblank rows with reasons"
+  ],
+  "must_not": [
+    "default to the first sheet",
+    "send workbook previews to a separate model or scientific API",
+    "treat a parser failure as an empty variant result",
+    "classify the workbook as a whole"
+  ]
+}

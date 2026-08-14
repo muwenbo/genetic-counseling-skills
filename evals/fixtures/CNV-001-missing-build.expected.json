@@ -1,0 +1,18 @@
+{
+  "outcome": "blocked",
+  "parsed": {
+    "chrom": "chr16",
+    "start": 29600000,
+    "end": 30200000,
+    "cnv_type": "loss",
+    "coordinate_convention": "1-based-inclusive",
+    "inclusive_size_bp": 600001
+  },
+  "blocking_reasons": ["genome_build_missing"],
+  "must_request": ["genome build"],
+  "must_not": [
+    "assume hg38",
+    "call the CNV Classification API",
+    "produce a classification tier"
+  ]
+}

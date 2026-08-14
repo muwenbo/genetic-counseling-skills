@@ -1,0 +1,20 @@
+{
+  "name": "personal",
+  "interface": {
+    "displayName": "Personal"
+  },
+  "plugins": [
+    {
+      "name": "rare-disease-genetic-counseling",
+      "source": {
+        "source": "local",
+        "path": "./plugins/rare-disease-genetic-counseling"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Healthcare"
+    }
+  ]
+}

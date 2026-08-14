@@ -1,0 +1,4 @@
+interface:
+  display_name: "Prepare Rare-Disease Case"
+  short_description: "Structure bilingual clinical findings"
+  default_prompt: "Use $prepare-rare-disease-case to structure this clinical narrative for review."

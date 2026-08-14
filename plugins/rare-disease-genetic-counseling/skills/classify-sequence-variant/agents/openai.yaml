@@ -1,0 +1,4 @@
+interface:
+  display_name: "Classify Sequence Variant"
+  short_description: "Build an ACMG/VCEP review proposal"
+  default_prompt: "Use $classify-sequence-variant to build a reviewable classification proposal."

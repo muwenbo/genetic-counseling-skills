@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/rare-disease/case-context.schema.json",
+  "title": "Rare Disease Case Context",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "scope", "observations", "variants", "missing_information"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "case_ref": {
+      "type": ["string", "null"],
+      "description": "Local pseudonymous reference; never required by external analysis services."
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain"],
+      "properties": {
+        "domain": {"const": "rare_disease_germline"},
+        "assay_type": {
+          "type": ["string", "null"],
+          "enum": ["wes", "wgs", "panel", "cma", "targeted", "unknown", null]
+        },
+        "genome_build": {
+          "type": ["string", "null"],
+          "enum": ["hg19", "hg38", null]
+        }
+      }
+    },
+    "proband": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "age": {"type": ["string", "null"]},
+        "sex": {"type": ["string", "null"], "enum": ["male", "female", "unknown", null]}
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/observation"}
+    },
+    "variants": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/variant"}
+    },
+    "family_members": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/familyMember"},
+      "default": []
+    },
+    "confounders": {
+      "type": "array",
+      "items": {"type": "string"},
+      "default": []
+    },
+    "missing_information": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["field", "reason", "blocks"],
+        "properties": {
+          "field": {"type": "string"},
+          "reason": {"type": "string"},
+          "blocks": {
+            "type": "array",
+            "items": {
+              "enum": ["normalization", "annotation", "ranking", "classification", "counseling", "none"]
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/provenance"},
+      "default": []
+    }
+  },
+  "$defs": {
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "label", "assertion", "temporality", "source"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+        "kind": {
+          "enum": ["phenotype", "laboratory", "infection", "anatomical", "diagnosis", "treatment", "exposure", "family_history", "other"]
+        },
+        "label": {"type": "string", "minLength": 1},
+        "assertion": {"enum": ["present", "explicitly_absent", "suspected", "unknown"]},
+        "temporality": {"enum": ["current", "historical", "resolved", "recurrent", "unknown"]},
+        "source": {"enum": ["user", "clinical_record", "laboratory_record", "family_report", "tool", "literature"]},
+        "source_text": {"type": ["string", "null"]},
+        "value": {"type": ["number", "string", "null"]},
+        "unit": {"type": ["string", "null"]},
+        "reference_range": {"type": ["string", "null"]},
+        "hpo": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["status", "candidates"],
+              "properties": {
+                "status": {"enum": ["unreviewed", "accepted", "rejected", "unresolved"]},
+                "accepted_id": {"type": ["string", "null"], "pattern": "^HP:[0-9]{7}$"},
+                "candidates": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["hp_id", "term", "score"],
+                    "properties": {
+                      "hp_id": {"type": "string", "pattern": "^HP:[0-9]{7}$"},
+                      "term": {"type": "string"},
+                      "score": {"type": "number", "minimum": 0, "maximum": 1},
+                      "graph_annotated_diseases": {"type": ["integer", "null"], "minimum": 0},
+                      "obsolete": {"type": "boolean", "default": false},
+                      "replaced_by": {"type": ["string", "null"]}
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "variant": {
+      "oneOf": [
+        {"$ref": "#/$defs/sequenceVariant"},
+        {"$ref": "#/$defs/cnvVariant"}
+      ]
+    },
+    "sequenceVariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "raw_input", "genome_build", "normalization_status"],
+      "properties": {
+        "id": {"type": "string"},
+        "kind": {"const": "sequence"},
+        "raw_input": {"type": "string"},
+        "genome_build": {"type": ["string", "null"], "enum": ["hg19", "hg38", null]},
+        "normalization_status": {"enum": ["not_started", "blocked", "normalized", "ambiguous", "failed"]},
+        "normalized": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["genome_build", "chrom", "pos", "ref", "alt", "reference_verified"],
+              "properties": {
+                "genome_build": {"const": "hg38"},
+                "chrom": {"type": "string", "pattern": "^(chr)?([1-9]|1[0-9]|2[0-2]|X|Y|MT)$"},
+                "pos": {"type": "integer", "minimum": 1},
+                "ref": {"type": "string", "pattern": "^[ACGTN]+$"},
+                "alt": {"type": "string", "pattern": "^[ACGTN]+$"},
+                "reference_verified": {"type": "boolean"}
+              }
+            }
+          ]
+        },
+        "transcript_id": {"type": ["string", "null"]},
+        "disease_context": {"type": ["string", "null"]},
+        "inheritance": {"type": ["string", "null"]},
+        "zygosity": {"type": ["string", "null"]},
+        "phase": {"type": ["string", "null"]}
+      }
+    },
+    "cnvVariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "raw_input", "genome_build", "chrom", "start", "end", "cnv_type", "normalization_status"],
+      "properties": {
+        "id": {"type": "string"},
+        "kind": {"const": "cnv"},
+        "raw_input": {"type": "string"},
+        "genome_build": {"type": ["string", "null"], "enum": ["hg19", "hg38", null]},
+        "chrom": {"type": "string", "pattern": "^(chr)?([1-9]|1[0-9]|2[0-2]|X|Y)$"},
+        "start": {"type": "integer", "minimum": 1},
+        "end": {"type": "integer", "minimum": 1},
+        "cnv_type": {"enum": ["loss", "gain"]},
+        "coordinate_convention": {"const": "1-based-inclusive"},
+        "inclusive_size_bp": {"type": "integer", "minimum": 1},
+        "normalization_status": {"enum": ["not_started", "blocked", "normalized", "failed"]}
+      }
+    },
+    "familyMember": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relation", "affected"],
+      "properties": {
+        "relation": {"type": "string"},
+        "affected": {"type": ["boolean", "null"]},
+        "sex": {"type": ["string", "null"], "enum": ["male", "female", "unknown", null]},
+        "variant_status": {"type": ["string", "null"]},
+        "confirmation_method": {"type": ["string", "null"]}
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "operation"],
+      "properties": {
+        "source": {"type": "string"},
+        "operation": {"type": "string"},
+        "version": {"type": ["string", "null"]},
+        "retrieved_at": {"type": ["string", "null"], "format": "date-time"},
+        "warnings": {"type": "array", "items": {"type": "string"}, "default": []}
+      }
+    }
+  }
+}

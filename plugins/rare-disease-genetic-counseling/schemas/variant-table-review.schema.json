@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/rare-disease/variant-table-review.schema.json",
+  "title": "Variant Table Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "review_required",
+    "source_file",
+    "workbook",
+    "selection",
+    "context",
+    "column_mappings",
+    "row_reconciliation",
+    "records",
+    "issues",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "status": {
+      "enum": ["blocked", "incomplete", "ready_for_review", "accepted", "rejected"]
+    },
+    "review_required": {"const": true},
+    "source_file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "format", "size_bytes"],
+      "properties": {
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "format": {"enum": ["xlsx", "csv", "tsv", "converted"]},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "conversion_provenance": {"type": ["string", "null"]}
+      }
+    },
+    "workbook": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sheets", "warnings"],
+      "properties": {
+        "sheets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["ref", "state", "row_count", "column_count"],
+            "properties": {
+              "ref": {"type": "string", "pattern": "^(sheet_[1-9][0-9]*|table)$"},
+              "state": {"enum": ["visible", "hidden", "veryHidden", "unknown"]},
+              "row_count": {"type": "integer", "minimum": 0},
+              "column_count": {"type": "integer", "minimum": 0},
+              "formula_count": {"type": "integer", "minimum": 0},
+              "merged_range_count": {"type": "integer", "minimum": 0}
+            }
+          }
+        },
+        "warnings": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "selection": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["sheet_ref", "header_row", "data_start_row", "data_end_row", "reviewer_status"],
+      "properties": {
+        "sheet_ref": {"type": "string", "pattern": "^(sheet_[1-9][0-9]*|table)$"},
+        "header_row": {"type": "integer", "minimum": 1},
+        "data_start_row": {"type": "integer", "minimum": 1},
+        "data_end_row": {"type": ["integer", "null"], "minimum": 1},
+        "reviewer_status": {"enum": ["unreviewed", "accepted", "revised", "rejected"]}
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assay_type", "sample_scope", "genome_build", "coordinate_convention"],
+      "properties": {
+        "assay_type": {"type": ["string", "null"]},
+        "sample_scope": {"type": ["string", "null"]},
+        "genome_build": {"type": ["string", "null"], "enum": ["hg19", "hg38", null]},
+        "coordinate_convention": {"type": ["string", "null"]}
+      }
+    },
+    "column_mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_column", "source_header", "canonical_field", "status"],
+        "properties": {
+          "source_column": {"type": "string"},
+          "source_header": {"type": "string"},
+          "canonical_field": {"type": "string"},
+          "status": {"enum": ["proposed", "accepted", "rejected", "unresolved"]},
+          "rationale": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "row_reconciliation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["examined", "accepted", "unresolved", "rejected", "blank"],
+      "properties": {
+        "examined": {"type": "integer", "minimum": 0},
+        "accepted": {"type": "integer", "minimum": 0},
+        "unresolved": {"type": "integer", "minimum": 0},
+        "rejected": {"type": "integer", "minimum": 0},
+        "blank": {"type": "integer", "minimum": 0}
+      }
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_sheet", "source_row", "disposition", "fields", "issues"],
+        "properties": {
+          "source_sheet": {"type": "string"},
+          "source_row": {"type": "integer", "minimum": 1},
+          "disposition": {"enum": ["accepted", "unresolved", "rejected"]},
+          "fields": {
+            "type": "object",
+            "additionalProperties": {"type": ["string", "number", "boolean", "null"]}
+          },
+          "issues": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "message", "blocks"],
+        "properties": {
+          "code": {"type": "string"},
+          "severity": {"enum": ["warning", "error"]},
+          "message": {"type": "string"},
+          "blocks": {"type": "boolean"}
+        }
+      }
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "operation"],
+        "properties": {
+          "source": {"type": "string"},
+          "operation": {"type": "string"},
+          "version": {"type": ["string", "null"]},
+          "retrieved_at": {"type": ["string", "null"], "format": "date-time"},
+          "warnings": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    }
+  }
+}

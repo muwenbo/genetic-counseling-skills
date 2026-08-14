@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1.0",
+  "fixtures": [
+    {
+      "id": "SEQ-001-missing-build",
+      "skill": "classify-sequence-variant",
+      "input": "fixtures/SEQ-001-missing-build.input.json",
+      "expected": "fixtures/SEQ-001-missing-build.expected.json"
+    },
+    {
+      "id": "CNV-001-missing-build",
+      "skill": "classify-cnv",
+      "input": "fixtures/CNV-001-missing-build.input.json",
+      "expected": "fixtures/CNV-001-missing-build.expected.json"
+    },
+    {
+      "id": "CASE-001-infant-immunodeficiency",
+      "skill": "prepare-rare-disease-case",
+      "input": "fixtures/CASE-001-infant-immunodeficiency.input.json",
+      "expected": "fixtures/CASE-001-infant-immunodeficiency.expected.json"
+    },
+    {
+      "id": "TABLE-001-ambiguous-layout",
+      "skill": "review-variant-table",
+      "input": "fixtures/TABLE-001-ambiguous-layout.input.json",
+      "expected": "fixtures/TABLE-001-ambiguous-layout.expected.json"
+    }
+  ]
+}

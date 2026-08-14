@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/rare-disease/interpretation-proposal.schema.json",
+  "title": "Rare Disease Interpretation Proposal",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "proposal_type", "status", "review_required", "evidence", "limitations", "provenance"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "proposal_type": {"enum": ["sequence_classification", "cnv_classification", "disease_candidate", "assay_blind_hypothesis", "counseling_draft"]},
+    "status": {"enum": ["blocked", "incomplete", "ready_for_review", "accepted", "revised", "rejected"]},
+    "review_required": {"const": true},
+    "subject_ref": {"type": ["string", "null"]},
+    "context": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "genome_build": {"type": ["string", "null"], "enum": ["hg19", "hg38", null]},
+        "coordinate_convention": {"type": ["string", "null"]},
+        "gene": {"type": ["string", "null"]},
+        "transcript": {"type": ["string", "null"]},
+        "disease": {"type": ["string", "null"]},
+        "inheritance": {"type": ["string", "null"]}
+      }
+    },
+    "proposed_tier": {
+      "type": ["string", "null"],
+      "enum": ["Pathogenic", "Likely pathogenic", "Uncertain significance", "Likely benign", "Benign", null]
+    },
+    "point_total": {"type": ["number", "null"]},
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "claim", "assessment", "direction", "source_type", "rationale"],
+        "properties": {
+          "id": {"type": "string"},
+          "claim": {"type": "string"},
+          "assessment": {"enum": ["met", "not_met", "not_applicable", "not_evaluated", "supports", "contradicts", "context_only"]},
+          "direction": {"enum": ["pathogenic", "benign", "neutral", "diagnostic_support", "diagnostic_contradiction"]},
+          "strength": {"type": ["string", "null"]},
+          "points": {"type": ["number", "null"]},
+          "source_type": {"enum": ["user", "record", "engine", "guideline", "database", "literature", "model_inference"]},
+          "source_ref": {"type": ["string", "null"]},
+          "rationale": {"type": "string"},
+          "requires_confirmation": {"type": "boolean", "default": false}
+        }
+      }
+    },
+    "missing_evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item", "impact"],
+        "properties": {
+          "item": {"type": "string"},
+          "impact": {"type": "string"},
+          "question": {"type": ["string", "null"]}
+        }
+      },
+      "default": []
+    },
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "recommended_actions": {"type": "array", "items": {"type": "string"}, "default": []},
+    "provenance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "operation"],
+        "properties": {
+          "source": {"type": "string"},
+          "operation": {"type": "string"},
+          "version": {"type": ["string", "null"]},
+          "retrieved_at": {"type": ["string", "null"], "format": "date-time"},
+          "warnings": {"type": "array", "items": {"type": "string"}, "default": []}
+        }
+      }
+    }
+  }
+}

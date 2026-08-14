@@ -1,0 +1,6 @@
+{
+  "request": "classify_cnv",
+  "cnv": "chr16:29,600,000-30,200,000 loss",
+  "genome_build": null,
+  "clinical_evidence": null
+}

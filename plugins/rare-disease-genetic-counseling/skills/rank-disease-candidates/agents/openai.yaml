@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rank Disease Candidates"
+  short_description: "Rank phenotype and variant candidates"
+  default_prompt: "Use $rank-disease-candidates to rank candidates from these reviewed phenotypes."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review Variant Table"
+  short_description: "Review and normalize laboratory variant tables"
+  default_prompt: "Use $review-variant-table to inspect and normalize this laboratory variant table for review."

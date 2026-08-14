@@ -1,0 +1,23 @@
+{
+  "outcome": "blocked",
+  "parsed_provisionally": {
+    "chrom": "chr1",
+    "pos": 197143682,
+    "ref": "GCTC",
+    "alt": "G"
+  },
+  "blocking_reasons": ["genome_build_missing"],
+  "must_request": [
+    "genome build",
+    "reference allele verification",
+    "zygosity",
+    "transcript and disease context",
+    "inheritance and parental testing when relevant"
+  ],
+  "must_not": [
+    "assume hg38",
+    "call a normalization or annotation service",
+    "assign ACMG criteria",
+    "produce a classification tier"
+  ]
+}

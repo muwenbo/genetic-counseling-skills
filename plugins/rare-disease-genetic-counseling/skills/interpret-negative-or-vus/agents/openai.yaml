@@ -1,0 +1,4 @@
+interface:
+  display_name: "Interpret Negative or VUS"
+  short_description: "Plan follow-up for negative or VUS cases"
+  default_prompt: "Use $interpret-negative-or-vus to assess assay blind spots and follow-up tests."
