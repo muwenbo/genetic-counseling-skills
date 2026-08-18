@@ -1,0 +1,12 @@
+{
+  "request": "prepare_rare_disease_case",
+  "source_language": "zh",
+  "finding": {
+    "source_text": "身材矮小",
+    "assertion": "present",
+    "temporality": "unknown"
+  },
+  "english_phrase": "short stature",
+  "translation_status": "agent_verified",
+  "verification_notes": "The concise English phrase preserves the source finding without changing specificity."
+}

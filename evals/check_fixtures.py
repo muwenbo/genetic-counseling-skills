@@ -34,6 +34,17 @@ def main() -> None:
     assert "assume hg38" in seq_expected["must_not"]
     assert "produce a classification tier" in seq_expected["must_not"]
 
+    seq_upstream_input, seq_upstream_expected = loaded[
+        "SEQ-002-pinned-upstream-annotation"
+    ]
+    assert seq_upstream_input["genome_build"] == "hg38"
+    assert seq_upstream_input["normalization"]["ref_alt_verified"] is True
+    assert seq_upstream_expected["adapter_operation"] == "annotate"
+    assert seq_upstream_expected["upstream_commit"] == (
+        "05bf1f6bce4e6be04f9e52b55db1d5fee03029d9"
+    )
+    assert "run upstream classify_variant.py" in seq_upstream_expected["must_not"]
+
     cnv_input, cnv_expected = loaded["CNV-001-missing-build"]
     parsed = cnv_expected["parsed"]
     assert cnv_input["genome_build"] is None
@@ -64,6 +75,27 @@ def main() -> None:
     assert "variant_sheet_ambiguous" in table_expected["blocking_reasons"]
     assert "default to the first sheet" in table_expected["must_not"]
     assert "both candidate sheets" in table_expected["must_preserve"]
+
+    hpo_review_input, hpo_review_expected = loaded[
+        "HPO-001-chinese-translation-review-required"
+    ]
+    assert hpo_review_input["source_language"] == "zh"
+    assert hpo_review_input["translation_status"] == "review_required"
+    assert len(hpo_review_input["candidate_english_phrases"]) == 2
+    assert hpo_review_expected["outcome"] == "blocked_before_remote_retrieval"
+    assert hpo_review_expected["hpo_search_request"] is None
+    assert hpo_review_expected["base_url"] == "https://rdkg.viknox.com.cn"
+    assert "send the Chinese source phrase to /hpo/search" in hpo_review_expected["must_not"]
+
+    hpo_verified_input, hpo_verified_expected = loaded[
+        "HPO-002-chinese-translation-agent-verified"
+    ]
+    assert hpo_verified_input["translation_status"] == "agent_verified"
+    assert hpo_verified_expected["outcome"] == "ready_for_hpo_search"
+    assert hpo_verified_expected["retrieval_mode"] == "sapbert_vector_search"
+    assert hpo_verified_expected["request_body"]["queries"] == ["short stature"]
+    assert hpo_verified_expected["endpoint"] == "POST /hpo/search"
+    assert "身材矮小" not in json.dumps(hpo_verified_expected["request_body"], ensure_ascii=False)
 
     print(f"Validated {len(fixtures)} independent fixtures.")
 

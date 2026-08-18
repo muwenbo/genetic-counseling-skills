@@ -8,6 +8,12 @@
       "expected": "fixtures/SEQ-001-missing-build.expected.json"
     },
     {
+      "id": "SEQ-002-pinned-upstream-annotation",
+      "skill": "classify-sequence-variant",
+      "input": "fixtures/SEQ-002-pinned-upstream-annotation.input.json",
+      "expected": "fixtures/SEQ-002-pinned-upstream-annotation.expected.json"
+    },
+    {
       "id": "CNV-001-missing-build",
       "skill": "classify-cnv",
       "input": "fixtures/CNV-001-missing-build.input.json",
@@ -24,6 +30,18 @@
       "skill": "review-variant-table",
       "input": "fixtures/TABLE-001-ambiguous-layout.input.json",
       "expected": "fixtures/TABLE-001-ambiguous-layout.expected.json"
+    },
+    {
+      "id": "HPO-001-chinese-translation-review-required",
+      "skill": "prepare-rare-disease-case",
+      "input": "fixtures/HPO-001-chinese-translation-review-required.input.json",
+      "expected": "fixtures/HPO-001-chinese-translation-review-required.expected.json"
+    },
+    {
+      "id": "HPO-002-chinese-translation-agent-verified",
+      "skill": "prepare-rare-disease-case",
+      "input": "fixtures/HPO-002-chinese-translation-agent-verified.input.json",
+      "expected": "fixtures/HPO-002-chinese-translation-agent-verified.expected.json"
     }
   ]
 }

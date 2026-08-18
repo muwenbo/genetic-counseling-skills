@@ -1,0 +1,21 @@
+{
+  "outcome": "ready_for_annotation",
+  "adapter_operation": "annotate",
+  "upstream_repository": "https://github.com/muwenbo/vcep-classification-skills",
+  "upstream_commit": "05bf1f6bce4e6be04f9e52b55db1d5fee03029d9",
+  "upstream_script": "variant-classifier/scripts/vep_annotate.py",
+  "remote_service": "https://rest.ensembl.org",
+  "must_preserve": [
+    "original variant",
+    "declared genome build",
+    "complete upstream annotation summary",
+    "upstream commit",
+    "service failure separately from empty annotation"
+  ],
+  "must_not": [
+    "run upstream classify_variant.py",
+    "treat VEP annotation as independent REF verification",
+    "apply PVS1 from consequence alone",
+    "treat missing population frequency as PM2"
+  ]
+}

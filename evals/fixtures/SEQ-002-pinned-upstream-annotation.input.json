@@ -1,0 +1,9 @@
+{
+  "request": "annotate_sequence_variant",
+  "variant": "chr17:7676154:G:C",
+  "genome_build": "hg38",
+  "normalization": {
+    "status": "verified",
+    "ref_alt_verified": true
+  }
+}

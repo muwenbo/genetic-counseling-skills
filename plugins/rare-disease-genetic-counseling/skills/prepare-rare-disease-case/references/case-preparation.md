@@ -31,15 +31,48 @@ specific confounding effect.
 
 ## HPO review
 
-1. Keep source span and negation output.
-2. Confirm candidate meaning, especially when score is below an exact lexical
+1. Keep source span, source language, assertion, and temporality local.
+2. For Chinese or mixed-language input, translate only the minimized finding
+   into an English retrieval phrase. Do not translate the whole narrative.
+3. Verify semantic equivalence locally. Use `agent_verified` when the mapping is
+   unambiguous; use `review_required` only when plausible alternatives could
+   materially change the HPO concept. Reviewer-resolved phrases may also be sent.
+4. Confirm candidate meaning, especially when score is below an exact lexical
    match.
-3. Accept one term per finding.
-4. Check obsolete/replacement state.
-5. Check whether a term has disease annotations before graph ranking. A
+5. Accept one term per finding.
+6. Check obsolete/replacement state.
+7. Check whether a term has disease annotations before graph ranking. A
    graph-dead term can be retained clinically but should be dropped or replaced
    for that retrieval call.
-6. Never treat a term extraction miss as a negative phenotype.
+8. Never treat a term extraction miss as a negative phenotype.
+
+## Chinese-to-English retrieval phrases
+
+The English phrase is a search key, not a replacement for the source finding.
+Keep polarity outside `/hpo/search` because the endpoint maps concepts rather
+than negation.
+
+| Chinese source finding | Local metadata | Proposed English search phrase |
+|---|---|---|
+| `身材矮小` | present | `short stature` |
+| `反复肺炎` | present, recurrent | `recurrent pneumonia` |
+| `无癫痫发作` | explicitly absent | `seizure` |
+| `既往新生儿黄疸` | present, historical | `neonatal jaundice` |
+
+Before sending a phrase, verify that it:
+
+- describes the finding rather than a suspected diagnosis;
+- preserves anatomical site, severity, onset, recurrence, and subtype when
+  explicitly stated;
+- does not invent an observation from a syndrome name or differential;
+- contains no name, date, record number, or free-text context;
+- is concise English suitable for HPO lexical or semantic search;
+- leaves negation, suspicion, and temporality in local structured metadata.
+
+If more than one English phrase could materially change the HPO mapping and
+local context does not resolve the choice, keep the alternatives as audit
+proposals and stop for reviewer selection. Do not use a model confidence score
+alone as evidence of semantic equivalence.
 
 ## Minimum review checklist
 
@@ -52,3 +85,6 @@ specific confounding effect.
 - family history and consanguinity are requested rather than inferred;
 - assay history and genome build are explicit before variant analysis;
 - direct identifiers are excluded from analysis payloads.
+- every Chinese/mixed finding sent for HPO search has an agent-verified or
+  reviewer-resolved English phrase;
+- disclosed search phrases and the destination base URL are recorded.

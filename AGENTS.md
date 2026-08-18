@@ -81,11 +81,17 @@ adapter can own the integration behavior.
 
 ### Knowledge-graph REST flow
 
+- Public base URL: `https://rdkg.viknox.com.cn`
+- Public skills use this HTTPS endpoint; do not document or route users to a
+  loopback development service.
+
 The knowledge graph is stateless and does not extract findings or diagnose:
 
 ```text
 clinical narrative
   -> skill extracts short positive and explicitly negative findings locally
+  -> Chinese/mixed findings are translated locally into English search phrases
+  -> agent verifies semantic equivalence or requests review for material ambiguity
   -> POST /hpo/search
   -> GET /hpo/terms/{hp_id}
   -> POST /candidates
@@ -132,6 +138,10 @@ These rules are non-negotiable:
    unimplemented criterion into VUS, no match, or `not_met`.
 8. Do not diagnose from a candidate rank, claim an associated gene was tested,
    or infer a variant, relative, genotype, de novo status, or phase.
+9. Do not send Chinese clinical text directly to public graph retrieval.
+   Translate each minimized finding locally and preserve assertion metadata
+   outside the phrase. The agent may disclose a semantically clear English
+   phrase; request review only when material ambiguity remains.
 
 When evidence is insufficient, stop or qualify the result and state exactly
 what information or capability is missing.
@@ -184,6 +194,12 @@ The initial skills are:
 `variant-classifier` and `paper-finder` from
 `muwenbo/vcep-classification-skills` are intended to be consumed through a
 single pinned Git submodule under `vendor/vcep-classification-skills`.
+
+The developer preview pins commit
+`05bf1f6bce4e6be04f9e52b55db1d5fee03029d9`. Sequence annotation and VCEP lookup
+may reuse the upstream scripts only through the plugin-owned safety adapter.
+Do not invoke upstream `classify_variant.py` as a clinical classifier; its PVS1,
+PM2, and evidence-state behavior does not meet this repository's guardrails.
 
 For upstream updates:
 

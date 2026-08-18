@@ -20,9 +20,7 @@ but they must not rename the underlying clinical operations into a second API.
 
 ## Knowledge-graph API
 
-The developer instance documented by `rd-knowledge-graph` uses
-`http://127.0.0.1:8100`. The public plugin must use a configurable base URL
-because no public deployment URL has been specified.
+Public base URL: `https://rdkg.viknox.com.cn`
 
 The service is stateless. It maps short phrases to HPO terms and HPO terms to
 ranked disease candidates; it does not extract findings from a narrative and
@@ -37,7 +35,12 @@ tool is needed.
 
 ### `POST /hpo/search`
 
-Maps up to 50 short English or Chinese clinical phrases to HPO candidates.
+Performs SapBERT embedding-based vector search over HPO labels and synonyms. The
+live health response identifies the embedding model, term and embedding counts,
+and vector dimension. The endpoint maps up to 50 short English clinical phrases
+to ranked HPO candidates; `k` is limited to 1-25 and `score_threshold` is
+optional. The public-plugin contract deliberately does not send Chinese clinical
+phrases because live retrieval has not shown reliable Chinese mapping.
 
 ```json
 {
@@ -47,11 +50,18 @@ Maps up to 50 short English or Chinese clinical phrases to HPO candidates.
 }
 ```
 
-The skill extracts findings locally, keeps assertion polarity locally, and sends
-only minimized phrases. It uses exactly one reviewed HPO term per phrase; the
-remaining candidates are alternatives for audit, not additional patient facts.
-Scores between plausible and incorrect matches overlap, so a score is not a
-correctness test.
+The skill extracts findings locally and keeps assertion polarity locally. For a
+Chinese or mixed-language source, it translates each minimized finding locally
+and checks semantic equivalence. The agent sends an unambiguous phrase without a
+mandatory human checkpoint. If alternate translations could materially change
+the concept, specificity, anatomical site, or negation scope, it requests review
+and pauses that finding. It never sends the raw narrative, Chinese source span,
+identifiers, or negation wording.
+
+The skill uses exactly one selected HPO term per finding; remaining candidates
+are alternatives for audit, not additional patient facts. Vector similarity is
+a retrieval signal, not clinical correctness, and a high score does not remove
+the need to compare term meaning with the source finding.
 
 ### `GET /hpo/terms/{hp_id}`
 
@@ -78,8 +88,10 @@ Ranks diseases from reviewed positive and explicitly absent HPO terms.
 }
 ```
 
-This endpoint is the operation performed by the `rank-disease-candidates`
-skill. The earlier snake-case name `rank_disease_candidates` was only a proposed
+This endpoint performs graph retrieval and deterministic scoring; it is not the
+vector-search step. It is the operation performed by the
+`rank-disease-candidates` skill. The earlier snake-case name
+`rank_disease_candidates` was only a proposed
 wrapper function and is removed. The skill must inspect both `score` and
 `support` selection arms, relations, contradictions, unresolved gene symbols,
 normalized HPO identifiers, and the coverage report. Associated genes are graph
@@ -150,8 +162,21 @@ pseudonymous sheet/row lineage, and sends no workbook preview to a separate
 model or scientific API. A parser failure or unresolved mapping is not an empty
 variant result.
 
-Sequence normalization, sequence evidence classification, and literature
-discovery/retrieval will follow the same direct-service pattern once their
-public contracts are selected. `vcep-classification-skills` and `paper-finder`
-remain upstream skill resources pinned by Git submodule commit, not operations
-on a plugin-owned gateway.
+Sequence annotation reuses pinned upstream `variant-classifier` code through
+`scripts/upstream_variant_adapter.py`. For HGVS, rsID, and normalized GRCh38
+genomic input, upstream `vep_annotate.py` calls Ensembl REST operations under
+`https://rest.ensembl.org/vep/human/`. The adapter requires an explicit build for
+genomic input, refuses hg19 rather than inheriting GRCh38, uses a bounded timeout,
+preserves the upstream JSON summary, and records the exact Git commit. It sends
+only the scientific variant and no case narrative or identifiers.
+
+VEP annotation is not normalization, liftover, independent REF verification, or
+classification. A timeout, malformed output, missing dependency, or commit
+mismatch is a service/capability failure rather than an absent annotation.
+
+VCEP specification lookup reuses upstream `check_vcep_spec.py`, its registry,
+and selected guideline at the same commit. Upstream `classify_variant.py` is not
+called because its evidence rules conflict with the local clinical guardrails.
+Sequence normalization, a validated corroborating evidence engine, and
+literature retrieval will follow the direct-service pattern once their public
+contracts are selected.

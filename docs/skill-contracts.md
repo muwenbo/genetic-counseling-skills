@@ -42,17 +42,25 @@ disease case context without diagnosing the proband.
 2. Preserve source spans or short source excerpts for reviewer traceability.
 3. Convert unambiguous numeric laboratory values to named abnormalities only
    when reference range, unit, and age context support the conversion.
-4. Use bilingual HPO extraction/search for candidate terms.
-5. Retain exactly one proposed HPO term per finding, keeping alternatives for
+4. For Chinese or mixed-language findings, translate each minimized finding
+   locally into an English retrieval phrase while keeping assertion, certainty,
+   and temporality outside the phrase.
+5. Check each English phrase for semantic equivalence. Send an unambiguous,
+   agent-verified phrase to vector search at
+   `POST https://rdkg.viknox.com.cn/hpo/search`; request reviewer resolution only
+   when ambiguity could materially change the HPO mapping. Never send raw
+   Chinese narrative.
+6. Retain exactly one proposed HPO term per finding, keeping alternatives for
    audit rather than submitting all candidates.
-6. Check obsolete/replaced and graph-dead terms when the knowledge graph is
+7. Check obsolete/replaced and graph-dead terms when the knowledge graph is
    available.
-7. Present findings and HPO proposals for review.
+8. Present findings, translation dispositions, and HPO proposals for review.
 
 **Outputs**
 
 - `case_context`;
 - accepted and unresolved HPO proposals;
+- English retrieval phrases and verification dispositions;
 - confounders and missing-data questions;
 - provenance and extractor limitations.
 
@@ -61,6 +69,8 @@ disease case context without diagnosing the proband.
 - a finding cannot be separated from a diagnosis or negation scope;
 - numeric laboratory context is insufficient;
 - an HPO candidate changes the meaning of the source phrase;
+- an English retrieval phrase is ambiguous or changes specificity and the agent
+  cannot resolve the intended meaning from local context;
 - the narrative contains identifiers that a proposed remote call does not need.
 
 **Must not** diagnose, treat unmentioned findings as absent, or promote a
@@ -132,12 +142,15 @@ disease candidates, clearly identifying which mode was used.
 **Workflow**
 
 1. Validate HPO identifiers and polarity.
-2. For phenotype-only mode, call the knowledge graph and inspect both score and
-   support selection arms.
-3. For variant-backed mode, use prioritization results and expose phenotype,
+2. When an HPO term came from Chinese text, require its agent-verified or
+   reviewer-resolved English retrieval phrase in the audit trail; never re-query
+   the raw Chinese phrase.
+3. For phenotype-only mode, call the public knowledge graph at
+   `https://rdkg.viknox.com.cn` and inspect both score and support selection arms.
+4. For variant-backed mode, use prioritization results and expose phenotype,
    genotype, inheritance, phase, and skipped-variant evidence.
-4. Reconcile the two lists without collapsing them into one opaque score.
-5. Explain coverage limitations and evidence conflicts.
+5. Reconcile the two lists without collapsing them into one opaque score.
+6. Explain coverage limitations and evidence conflicts.
 
 **Outputs**
 
@@ -169,16 +182,23 @@ proposal for one constitutional sequence variant and one disease context.
 
 1. Parse without changing the asserted variant.
 2. Require genome build for genomic coordinates.
-3. Normalize to GRCh38 and verify chromosome, position, REF, and ALT against a
+3. Verify the pinned `vcep-classification-skills` dependency and exact commit.
+   Dependency failure is not an empty annotation.
+4. Normalize to GRCh38 and verify chromosome, position, REF, and ALT against a
    reference source; preserve the original representation.
-4. Resolve transcript, gene, disease, inheritance, zygosity, and phase gaps.
-5. Retrieve annotations and population evidence.
-6. Select the applicable VCEP document by gene, disease, and inheritance;
+5. Reuse upstream `vep_annotate.py` through the local safety adapter. Preserve
+   the returned annotation and do not treat VEP as independent REF verification.
+6. Resolve transcript, gene, disease, inheritance, zygosity, and phase gaps.
+7. Retrieve additional population evidence without converting missing fields to
+   absence.
+8. Reuse upstream `check_vcep_spec.py` and registry, then select the applicable
+   VCEP document by gene, disease, and inheritance;
    record its version and submodule commit.
-7. Evaluate all criteria as `met`, `not_met`, `not_applicable`, or
+9. Evaluate all criteria as `met`, `not_met`, `not_applicable`, or
    `not_evaluated`, with strength and evidence provenance.
-8. Compare automated engine output with the independently assembled proposal.
-9. Present the proposal and unresolved evidence for human review.
+10. Do not use upstream `classify_variant.py`; compare only a separately
+    validated engine output with the independently assembled proposal.
+11. Present the proposal and unresolved evidence for human review.
 
 **Outputs**
 

@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/rare-disease/sequence-annotation.schema.json",
+  "title": "Pinned Upstream Sequence Annotation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "provenance"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0"
+    },
+    "operation": {
+      "const": "sequence_variant_annotation"
+    },
+    "status": {
+      "enum": [
+        "annotation_ready",
+        "blocked_representation_mismatch",
+        "blocked",
+        "capability_unavailable",
+        "service_failure"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "classification": {
+      "type": "null"
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "notation",
+        "notation_type",
+        "declared_genome_build"
+      ],
+      "properties": {
+        "notation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "notation_type": {
+          "enum": [
+            "genomic",
+            "hgvs_or_identifier"
+          ]
+        },
+        "declared_genome_build": {
+          "enum": [
+            "hg19",
+            "hg38",
+            null
+          ]
+        }
+      }
+    },
+    "remote_disclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "service",
+        "base_url",
+        "fields"
+      ],
+      "properties": {
+        "service": {
+          "const": "Ensembl REST"
+        },
+        "base_url": {
+          "const": "https://rest.ensembl.org"
+        },
+        "fields": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "variant"
+            }
+          ],
+          "items": false,
+          "minItems": 1,
+          "maxItems": 1
+        }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "returned_assembly",
+        "assembly_concordant",
+        "returned_representation_concordant",
+        "ref_alt_independently_verified",
+        "classification_ready",
+        "annotation_source",
+        "annotation_source_expected",
+        "annotation_source_concordant"
+      ],
+      "properties": {
+        "returned_assembly": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "assembly_concordant": {
+          "type": "boolean"
+        },
+        "returned_representation_concordant": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ref_alt_independently_verified": {
+          "const": false
+        },
+        "classification_ready": {
+          "const": false
+        },
+        "annotation_source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "annotation_source_expected": {
+          "const": "ensembl"
+        },
+        "annotation_source_concordant": {
+          "type": "boolean"
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "commit",
+        "operation",
+        "retrieved_at"
+      ],
+      "properties": {
+        "repository": {
+          "const": "https://github.com/muwenbo/vcep-classification-skills"
+        },
+        "commit": {
+          "const": "05bf1f6bce4e6be04f9e52b55db1d5fee03029d9"
+        },
+        "operation": {
+          "type": "string"
+        },
+        "retrieved_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "annotation_ready",
+              "blocked_representation_mismatch"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "operation",
+          "input",
+          "remote_disclosure",
+          "annotation",
+          "validation",
+          "limitations"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "blocked",
+              "capability_unavailable",
+              "service_failure"
+            ]
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "reason",
+          "message",
+          "classification"
+        ]
+      }
+    }
+  ]
+}

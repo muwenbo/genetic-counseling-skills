@@ -14,12 +14,27 @@ Current design artifacts:
 - `docs/rest-api-contracts.md` — REST endpoints wrapped by the skills
 - `plugins/rare-disease-genetic-counseling/schemas/case-context.schema.json` — shared phenotype and case representation
 - `plugins/rare-disease-genetic-counseling/schemas/interpretation-proposal.schema.json` — auditable classification and hypothesis output
+- `plugins/rare-disease-genetic-counseling/schemas/sequence-annotation.schema.json` — pinned upstream annotation envelope and validation state
 - `plugins/rare-disease-genetic-counseling/schemas/variant-table-review.schema.json` — auditable laboratory-table inspection and mapping
 - `evals/manifest.json` — acceptance fixtures derived from independent examples
 
-The skills-only plugin scaffold and repo-local marketplace are installed for
-developer preview. REST clients are not connected yet; the contracts and
-acceptance behavior should be reviewed first.
+The plugin scaffold and repo-local marketplace are installed for developer
+preview. Knowledge-graph and CNV contracts are documented. Sequence-variant
+annotation and VCEP lookup reuse a pinned upstream submodule through a local
+safety adapter; broader sequence normalization and evidence services remain to
+be connected.
+
+Initialize the pinned upstream dependency after cloning:
+
+```bash
+git submodule update --init --recursive
+```
+
+The knowledge-graph skills use the public endpoint
+`https://rdkg.viknox.com.cn`. Chinese or mixed-language findings are translated
+locally into minimized English phrases before vector HPO search. The agent may
+proceed when the mapping is semantically clear and requests review only when
+ambiguity could change the HPO concept.
 
 Validate fixture integrity with:
 

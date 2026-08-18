@@ -101,10 +101,61 @@
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["status", "candidates"],
+              "required": ["status", "retrieval", "candidates"],
               "properties": {
                 "status": {"enum": ["unreviewed", "accepted", "rejected", "unresolved"]},
                 "accepted_id": {"type": ["string", "null"], "pattern": "^HP:[0-9]{7}$"},
+                "retrieval": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "source_language",
+                    "english_phrase",
+                    "translation_status",
+                    "disclosed_to_service",
+                    "destination_base_url"
+                  ],
+                  "properties": {
+                    "source_language": {"enum": ["en", "zh", "mixed", "other"]},
+                    "english_phrase": {"type": ["string", "null"]},
+                    "translation_status": {
+                      "enum": [
+                        "not_required",
+                        "agent_verified",
+                        "review_required",
+                        "reviewer_accepted",
+                        "reviewer_revised",
+                        "rejected"
+                      ]
+                    },
+                    "disclosed_to_service": {"type": "boolean"},
+                    "destination_base_url": {"type": ["string", "null"], "format": "uri"},
+                    "retrieved_at": {"type": ["string", "null"], "format": "date-time"},
+                    "verification_notes": {"type": ["string", "null"]}
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "source_language": {"enum": ["zh", "mixed"]},
+                          "disclosed_to_service": {"const": true}
+                        },
+                        "required": ["source_language", "disclosed_to_service"]
+                      },
+                      "then": {
+                        "properties": {
+                          "english_phrase": {"type": "string", "minLength": 1},
+                          "translation_status": {
+                            "enum": ["agent_verified", "reviewer_accepted", "reviewer_revised"]
+                          },
+                          "destination_base_url": {
+                            "const": "https://rdkg.viknox.com.cn"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
                 "candidates": {
                   "type": "array",
                   "items": {

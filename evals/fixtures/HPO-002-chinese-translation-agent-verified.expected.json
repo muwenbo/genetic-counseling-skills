@@ -1,0 +1,25 @@
+{
+  "outcome": "ready_for_hpo_search",
+  "base_url": "https://rdkg.viknox.com.cn",
+  "endpoint": "POST /hpo/search",
+  "retrieval_mode": "sapbert_vector_search",
+  "request_body": {
+    "queries": [
+      "short stature"
+    ],
+    "k": 5,
+    "score_threshold": 0.75
+  },
+  "local_metadata": {
+    "source_language": "zh",
+    "assertion": "present",
+    "temporality": "unknown",
+    "translation_status": "agent_verified"
+  },
+  "must_not": [
+    "require human acceptance for an unambiguous mapping",
+    "include the Chinese source phrase in the request",
+    "include assertion or temporality in the search phrase",
+    "accept all returned HPO candidates as patient findings"
+  ]
+}

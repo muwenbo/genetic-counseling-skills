@@ -8,6 +8,8 @@ description: Rank and explain rare-disease candidates from reviewed HPO terms, e
 Keep phenotype-only retrieval and variant-backed prioritization distinct. A rank
 is evidence for review, not a diagnosis.
 
+Use the public knowledge-graph base URL `https://rdkg.viknox.com.cn`.
+
 ## Select the mode
 
 - Use `phenotype_only` for reviewed HPO terms without relying on a variant set.
@@ -18,18 +20,24 @@ is evidence for review, not a diagnosis.
 
 1. Accept only reviewed positive HPO terms and explicitly absent terms. Do not
    convert unmentioned features to negatives.
-2. Inspect obsolete/replacement status and graph annotation coverage with
+2. For HPO terms derived from Chinese or mixed-language text, require an
+   `agent_verified` or reviewer-resolved English retrieval phrase in the audit
+   trail. Never re-query the raw Chinese phrase.
+3. Call `GET /healthz` without case data and record returned versions and graph
+   availability.
+4. Inspect obsolete/replacement status and graph annotation coverage with
    `GET /hpo/terms/{hp_id}`. Drop or replace graph-dead terms for graph ranking
    while retaining the original proposal in the audit trail.
-3. For phenotype-only mode, call the configured knowledge-graph REST API at
-   `POST /candidates` with `limit: 50` and `detail: "standard"`. Inspect both
-   score-selected and support-selected candidates.
-4. For variant-backed mode, accept a user-supplied or separately generated
+5. For phenotype-only mode, call
+   `POST https://rdkg.viknox.com.cn/candidates` with `limit: 50` and
+   `detail: "standard"`. Inspect both score-selected and support-selected
+   candidates.
+6. For variant-backed mode, accept a user-supplied or separately generated
    prioritization result. Review inheritance, phase, compound heterozygosity,
    phenotype match type, skipped variants, and assay coverage—not only rank.
-5. In `both` mode, show agreement, disagreement, and evidence unique to each
+7. In `both` mode, show agreement, disagreement, and evidence unique to each
    mode. Do not average unlike scores.
-6. Explain graph and assay coverage limitations before interpreting a negative
+8. Explain graph and assay coverage limitations before interpreting a negative
    result.
 
 ## Output
@@ -45,6 +53,8 @@ support-arm candidates, or absent results.
 ## Stop conditions
 
 - Stop phenotype-only ranking when there is no reviewed positive phenotype.
+- Stop when a Chinese-derived HPO mapping lacks an agent-verified or
+  reviewer-resolved English retrieval phrase in its audit trail.
 - Qualify stale, partial, or failed prioritization output.
 - Report unavailable infrastructure separately from an empty candidate list.
 

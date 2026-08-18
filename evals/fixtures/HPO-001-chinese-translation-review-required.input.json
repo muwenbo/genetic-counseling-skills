@@ -1,0 +1,15 @@
+{
+  "request": "prepare_rare_disease_case",
+  "source_language": "zh",
+  "finding": {
+    "source_text": "发育迟缓",
+    "assertion": "present",
+    "temporality": "unknown"
+  },
+  "candidate_english_phrases": [
+    "developmental delay",
+    "growth delay"
+  ],
+  "translation_status": "review_required",
+  "ambiguity": "Local context does not distinguish neurodevelopmental delay from impaired physical growth."
+}

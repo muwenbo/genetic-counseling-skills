@@ -1,0 +1,18 @@
+{
+  "outcome": "blocked_before_remote_retrieval",
+  "base_url": "https://rdkg.viknox.com.cn",
+  "must_request": [
+    "clarification of whether the finding concerns neurodevelopment or physical growth"
+  ],
+  "must_preserve_locally": {
+    "source_text": "发育迟缓",
+    "assertion": "present",
+    "temporality": "unknown"
+  },
+  "hpo_search_request": null,
+  "must_not": [
+    "send the Chinese source phrase to /hpo/search",
+    "choose an English phrase when local context does not resolve a material ambiguity",
+    "treat both alternatives as separate patient observations"
+  ]
+}

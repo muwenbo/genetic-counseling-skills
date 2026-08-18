@@ -1,0 +1,3 @@
+[submodule "vendor/vcep-classification-skills"]
+	path = vendor/vcep-classification-skills
+	url = https://github.com/muwenbo/vcep-classification-skills.git

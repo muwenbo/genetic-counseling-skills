@@ -40,20 +40,23 @@ rare-disease-genetic-counseling/
 └── evals/
 ```
 
-Skills call the configured scientific REST APIs through small bundled clients.
+Skills call the documented scientific REST APIs through small bundled clients.
 The public plugin does not depend on Noxia or another clinical record system.
 Service-specific request and response contracts remain explicit so API failures
 cannot be mistaken for negative clinical results.
+
+The public knowledge-graph endpoint is `https://rdkg.viknox.com.cn`.
 
 ## Integration map
 
 | Capability | Source | Integration mode | Plugin responsibility |
 |---|---|---|---|
-| Finding extraction | skill reasoning, performed locally | in-skill workflow | Preserve spans and negation; require review before accepting HPO terms |
+| Finding extraction | skill reasoning, performed locally | in-skill workflow | Preserve spans and negation; translate minimized Chinese findings locally; proceed when the agent can verify semantic equivalence and request review only for material ambiguity |
 | Laboratory variant-table review | bundled local script plus skill reasoning | local file workflow | Inventory without mutation, exclude identifiers, require reviewed sheet/header/mapping, and preserve company annotations as supplied claims |
-| HPO search and phenotype-only disease retrieval | `rd-knowledge-graph` | configurable REST API | Call `/hpo/search`, `/hpo/terms/{hp_id}`, and `/candidates`; check graph coverage and never equate absence with exclusion |
+| HPO search and phenotype-only disease retrieval | `rd-knowledge-graph` at `https://rdkg.viknox.com.cn` | public HTTPS REST API | Send only agent-verified or reviewer-resolved English phrases to vector `/hpo/search`; call `/hpo/terms/{hp_id}` and graph `/candidates`; check graph coverage and never equate absence with exclusion |
 | Optional variant-backed gene ranking | user-supplied prioritization result | imported result | Keep external rank distinct from clinical conclusion; expose inheritance and phenotype evidence |
-| Variant normalization | `hgvs-tools` | local HTTP service | Require explicit assembly for genomic input; independently verify REF before classification |
+| Variant normalization | `hgvs-tools` | planned local HTTP service | Require explicit assembly for genomic input; independently verify REF before classification |
+| Sequence annotation | pinned `variant-classifier` `vep_annotate.py` | local safety adapter calling Ensembl REST | Reuse upstream code without modifying it; require normalized GRCh38 genomic input; preserve returned annotation and never claim VEP independently verified REF/ALT |
 | Sequence evidence engine | `acmg-auto-classifier` | local HTTP service | Label output as automated and incomplete; build a reviewable proposal |
 | VCEP guidance | `vcep-classification-skills` | immutable Git submodule | Select disease/inheritance-specific specification and record exact commit/version |
 | CNV classification | `cnvclassifier.viknox.com` | remote HTTPS API | Minimize payload, require build, preserve liftover and complete evidence trail |
@@ -82,6 +85,11 @@ cannot be mistaken for negative clinical results.
 9. **Laboratory tables are untrusted source artifacts.** Never silently select a
    sheet, drop a row, infer a build, or treat a company filter, classification,
    ACMG code, frequency, or candidate rank as independently verified evidence.
+10. **Chinese graph retrieval uses semantically checked English phrases.**
+    Extract and translate minimized findings locally, preserve assertion and
+    temporality outside the phrase, and let the agent proceed when equivalence is
+    clear. Request reviewer resolution when ambiguity, altered specificity, or
+    uncertain negation scope could change the HPO mapping.
 
 ## Provenance envelope
 
@@ -93,15 +101,27 @@ Every tool-derived result should record:
 - call time;
 - declared genome build and coordinate convention;
 - request fields sent, with identifiers and narrative excluded or redacted;
+- source language, proposed English retrieval phrase, verification disposition,
+  and whether the phrase was disclosed;
 - local file hash, pseudonymous sheet reference, source row, reviewed column
   mapping, and row reconciliation for table-derived records;
 - warnings, failures, liftover information, and unfilled fields;
-- whether a human accepted, revised, or rejected the proposal.
+- whether the agent verified the phrase or requested/received reviewer input.
 
 ## Upstream update policy
 
-`vcep-classification-skills` will be a Git submodule after its licensing and
-remediation branch are suitable for a reproducible pin.
+`vcep-classification-skills` is pinned as a Git submodule at commit
+`05bf1f6bce4e6be04f9e52b55db1d5fee03029d9` for developer-preview annotation,
+VCEP registry lookup, and guideline access. A thin local adapter owns input
+validation, dependency verification, privacy filtering, timeouts, response
+preservation, and the distinction between failure and an empty lookup.
+
+The upstream automatic classifier is not executed because its consequence-only
+PVS1, absent-frequency PM2, and binary evidence behavior conflict with this
+plugin's clinical guardrails. The upstream README declares MIT, but no standalone
+license file is present; public redistribution remains blocked pending explicit
+license text. Root-level submodules are also not copied into the Codex plugin
+cache, so public packaging of the dependency remains a release gate.
 
 An update automation may:
 
@@ -116,7 +136,7 @@ plugin-specific changes belong in adapters owned by the main repository.
 
 ## Release gates
 
-The local preview may proceed once the three initial fixtures pass. A public
+The local preview may proceed once all acceptance fixtures pass. A public
 release additionally requires:
 
 - explicit licenses for bundled/copied code and data;
