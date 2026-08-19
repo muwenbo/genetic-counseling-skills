@@ -1,0 +1,12 @@
+{
+  "outcome": "blocked",
+  "blocking_reasons": ["genome_build_missing"],
+  "must_request": ["genome build"],
+  "must_preserve": ["unknown-frequency variants as unknown, not rare or common"],
+  "must_not": [
+    "assume a genome build",
+    "add annotations not present in the file",
+    "treat an unannotated variant as rare by default",
+    "run automatically as a fallback from disease ranking"
+  ]
+}

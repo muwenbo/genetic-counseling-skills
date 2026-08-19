@@ -32,6 +32,12 @@
       "expected": "fixtures/TABLE-001-ambiguous-layout.expected.json"
     },
     {
+      "id": "CALLSET-001-missing-build",
+      "skill": "filter-variant-callset",
+      "input": "fixtures/CALLSET-001-missing-build.input.json",
+      "expected": "fixtures/CALLSET-001-missing-build.expected.json"
+    },
+    {
       "id": "HPO-001-chinese-translation-review-required",
       "skill": "prepare-rare-disease-case",
       "input": "fixtures/HPO-001-chinese-translation-review-required.input.json",

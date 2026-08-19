@@ -127,6 +127,56 @@ identifiers, execute macros, overwrite the source, silently delete variants,
 equate a laboratory filter with benignity, infer that an absent gene was tested,
 or classify the entire table without variant-level review.
 
+## `filter-variant-callset`
+
+**Goal:** Filter a large, locally stored annotated germline WES/WGS callset into a
+reviewable variant shortlist using reviewer-approved criteria, producing a
+`variant_prioritization` result without accepting the shortlist as a diagnosis.
+
+**Inputs**
+
+- local annotated `.vcf`/`.vcf.gz`, `.tsv`, `.csv`, or `.xlsx` callset;
+- explicit genome build;
+- reviewer-approved field mapping and thresholds (frequency, consequence, gene
+  panel, quality, candidate zygosity), resolved against annotations already in
+  the file.
+
+**Workflow**
+
+1. Keep the callset local; compute a file hash without retaining the filename.
+2. Inspect the callset for format, variant count, chromosome coverage, sample
+   columns, and candidate annotation fields without mutating the source. Propose
+   field specs; never select one automatically.
+3. Require human review of the field mapping and thresholds before filtering.
+   Stop on an ambiguous field rather than guessing.
+4. Apply only reviewer-approved deterministic filters. Treat a variant lacking a
+   frequency annotation as unknown frequency, never as rare or common by default.
+5. Emit a stage-by-stage funnel and excluded-class counts so no variant class is
+   silently dropped; the source is never rewritten.
+6. Route the shortlist to `rank-disease-candidates` variant_backed as an imported
+   prioritization result, keeping the filter funnel separate from any ranking.
+
+**Outputs**
+
+- `variant_prioritization` artifact with file hash, genome build, and parameters;
+- shortlisted candidates with supplied annotations preserved and labeled;
+- stage funnel, unknown-frequency count, and excluded-class counts;
+- downstream routing recommendation.
+
+**Hard stops:** missing genome build, an annotation field for a requested filter
+that cannot be resolved unambiguously, frequency or consequence filtering
+requested on a callset without that annotation, mixed samples or builds without a
+reliable discriminator, a funnel that does not reconcile, malformed parser
+output, a file that is a curated laboratory report table (route to
+`review-variant-table`), or a parser failure mistaken for an empty callset.
+
+**Must not** add annotations not present in the file, contact the network, upload
+the callset or rows to a separate model or service, log filenames or identifiers,
+overwrite the source, silently delete a variant class, treat an unannotated
+variant as rare or common, infer phase, segregation, compound heterozygosity, or
+de-novo status, run automatically as a fallback within disease ranking, or treat
+a gene absent from the shortlist as adequately assessed.
+
 ## `rank-disease-candidates`
 
 **Goal:** Produce phenotype-only disease candidates or variant-backed gene and

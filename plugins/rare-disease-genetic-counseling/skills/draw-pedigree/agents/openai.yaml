@@ -1,0 +1,4 @@
+interface:
+  display_name: "Draw Pedigree"
+  short_description: "Chart a family pedigree from history"
+  default_prompt: "Use $draw-pedigree to build a pedigree figure from this family history."

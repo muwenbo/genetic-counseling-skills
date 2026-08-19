@@ -1,6 +1,6 @@
 ---
 name: draft-counseling-summary
-description: Draft clinician-facing and optional patient-facing rare-disease germline genetic counseling summaries from reviewed case facts and interpretation proposals. Use when asked to summarize a positive, VUS, or negative result; explain inheritance or family implications; prepare counseling notes; communicate testing limitations; or draft follow-up recommendations for professional review.
+description: Draft clinician-facing and optional patient-facing rare-disease germline genetic counseling summaries from reviewed case facts and interpretation proposals. Use when asked to summarize a positive, VUS, or negative result; explain inheritance or family implications; prepare counseling notes; communicate testing limitations; or communicate reviewed follow-up recommendations for professional review.
 ---
 
 # Draft a counseling summary

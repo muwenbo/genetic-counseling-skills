@@ -76,6 +76,21 @@ def main() -> None:
     assert "default to the first sheet" in table_expected["must_not"]
     assert "both candidate sheets" in table_expected["must_preserve"]
 
+    callset_input, callset_expected = loaded["CALLSET-001-missing-build"]
+    assert callset_input["genome_build"] is None
+    assert callset_input["external_prioritization_result"] is None
+    assert callset_expected["outcome"] == "blocked"
+    assert "genome_build_missing" in callset_expected["blocking_reasons"]
+    assert "assume a genome build" in callset_expected["must_not"]
+    assert (
+        "treat an unannotated variant as rare by default"
+        in callset_expected["must_not"]
+    )
+    assert (
+        "run automatically as a fallback from disease ranking"
+        in callset_expected["must_not"]
+    )
+
     hpo_review_input, hpo_review_expected = loaded[
         "HPO-001-chinese-translation-review-required"
     ]

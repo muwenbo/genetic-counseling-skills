@@ -33,7 +33,9 @@ Use the public knowledge-graph base URL `https://rdkg.viknox.com.cn`.
    `detail: "standard"`. Inspect both score-selected and support-selected
    candidates.
 6. For variant-backed mode, accept a user-supplied or separately generated
-   prioritization result. Review inheritance, phase, compound heterozygosity,
+   prioritization result. This skill consumes a prioritization result and does
+   not produce one; a callset can be filtered into one separately with
+   `filter-variant-callset`. Review inheritance, phase, compound heterozygosity,
    phenotype match type, skipped variants, and assay coverage—not only rank.
 7. In `both` mode, show agreement, disagreement, and evidence unique to each
    mode. Do not average unlike scores.

@@ -27,6 +27,7 @@ rare-disease-genetic-counseling/
 ├── skills/
 │   ├── prepare-rare-disease-case/
 │   ├── review-variant-table/
+│   ├── filter-variant-callset/
 │   ├── rank-disease-candidates/
 │   ├── classify-sequence-variant/
 │   ├── classify-cnv/
@@ -55,6 +56,7 @@ The public knowledge-graph endpoint is `https://rdkg.viknox.com.cn`.
 | Laboratory variant-table review | bundled local script plus skill reasoning | local file workflow | Inventory without mutation, exclude identifiers, require reviewed sheet/header/mapping, and preserve company annotations as supplied claims |
 | HPO search and phenotype-only disease retrieval | `rd-knowledge-graph` at `https://rdkg.viknox.com.cn` | public HTTPS REST API | Send only agent-verified or reviewer-resolved English phrases to vector `/hpo/search`; call `/hpo/terms/{hp_id}` and graph `/candidates`; check graph coverage and never equate absence with exclusion |
 | Optional variant-backed gene ranking | user-supplied prioritization result | imported result | Keep external rank distinct from clinical conclusion; expose inheritance and phenotype evidence |
+| Local callset filtering | bundled local script plus skill reasoning | local file workflow | Filter an annotated callset with reviewer-approved criteria into an imported prioritization result; filter only on file-supplied annotations; never run as an automatic fallback from ranking |
 | Variant normalization | `hgvs-tools` | planned local HTTP service | Require explicit assembly for genomic input; independently verify REF before classification |
 | Sequence annotation | pinned `variant-classifier` `vep_annotate.py` | local safety adapter calling Ensembl REST | Reuse upstream code without modifying it; require normalized GRCh38 genomic input; preserve returned annotation and never claim VEP independently verified REF/ALT |
 | Sequence evidence engine | `acmg-auto-classifier` | local HTTP service | Label output as automated and incomplete; build a reviewable proposal |

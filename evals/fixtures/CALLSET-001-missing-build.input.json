@@ -1,0 +1,12 @@
+{
+  "request": "filter_variant_callset",
+  "file_format": "vcf",
+  "annotations_present": ["gnomad_AF", "CSQ/Consequence", "CSQ/SYMBOL"],
+  "genome_build": null,
+  "external_prioritization_result": null,
+  "requested_filters": {
+    "af_field": "INFO/gnomad_AF",
+    "af_max": 0.001,
+    "consequence_field": "CSQ/Consequence"
+  }
+}
