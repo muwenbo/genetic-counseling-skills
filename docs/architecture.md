@@ -33,7 +33,8 @@ rare-disease-genetic-counseling/
 │   ├── classify-cnv/
 │   ├── find-variant-literature/
 │   ├── interpret-negative-or-vus/
-│   └── draft-counseling-summary/
+│   ├── draft-counseling-summary/
+│   └── draw-pedigree/
 ├── vendor/
 │   └── vcep-classification-skills/  # Git submodule
 ├── scripts/                     # shared REST client helpers, if needed
@@ -63,7 +64,7 @@ The public knowledge-graph endpoint is `https://rdkg.viknox.com.cn`.
 | VCEP guidance | `vcep-classification-skills` | immutable Git submodule | Select disease/inheritance-specific specification and record exact commit/version |
 | CNV classification | `cnvclassifier.viknox.com` | remote HTTPS API | Minimize payload, require build, preserve liftover and complete evidence trail |
 | Literature | PubMed/PMC via upstream paper finder plus discovery adapter | remote retrieval | Distinguish discovery from PMID fetch; preserve licensing and evidence extraction provenance |
-| Pedigree | `pedigree-chart` | future optional export | Generate reviewable PED/JSON; do not infer relatives or genotypes |
+| Pedigree charting | bundled offline Pedigree Studio tool plus skill reasoning | local file and browser workflow | Generate a reviewable PED/JSON project and export the figure locally; never infer relatives, phenotypes, or genotypes |
 
 ## Non-negotiable correctness boundaries
 
