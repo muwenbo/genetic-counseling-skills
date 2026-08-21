@@ -1,0 +1,6 @@
+{
+  "request": "annotate_sequence_variant",
+  "variant": "NM_004006.2:c.6787del",
+  "disease_context": "DMD-related dystrophinopathy",
+  "current_annotation_service_supports_asserted_transcript": false
+}

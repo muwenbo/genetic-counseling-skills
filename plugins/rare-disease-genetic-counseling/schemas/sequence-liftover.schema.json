@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/rare-disease/sequence-liftover.schema.json",
+  "title": "Sequence Variant Liftover",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "status", "provenance"],
+  "properties": {
+    "schema_version": {"const": "0.1.0"},
+    "operation": {"const": "sequence_variant_liftover"},
+    "status": {
+      "enum": ["liftover_ready", "blocked", "service_failure"]
+    },
+    "reason": {"type": "string"},
+    "message": {"type": "string"},
+    "classification": {"type": "null"},
+    "input": {
+      "type": "object",
+      "required": ["asserted_notation", "from_build", "to_build"],
+      "properties": {
+        "asserted_notation": {"type": "string"},
+        "from_build": {"enum": ["hg19", "hg38"]},
+        "to_build": {"enum": ["hg19", "hg38"]}
+      }
+    },
+    "normalized_source": {"$ref": "#/$defs/allele"},
+    "target": {
+      "allOf": [
+        {"$ref": "#/$defs/allele"},
+        {"type": "object", "required": ["notation"]}
+      ]
+    },
+    "mapping": {
+      "type": "object",
+      "required": ["forward", "strand", "reverse", "roundtrip_concordant"],
+      "properties": {
+        "strand": {"enum": [-1, 1]},
+        "roundtrip_concordant": {"const": true}
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": [
+        "source_ref_verified",
+        "single_contiguous_mapping",
+        "target_ref_verified",
+        "alleles_reverse_complemented",
+        "normalization_applied"
+      ],
+      "properties": {
+        "source_ref_verified": {"const": true},
+        "single_contiguous_mapping": {"const": true},
+        "target_ref_verified": {"const": true},
+        "alleles_reverse_complemented": {"type": "boolean"},
+        "normalization_applied": {"const": true}
+      }
+    },
+    "remote_disclosures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["service", "base_urls", "operations", "fields"],
+        "properties": {
+          "service": {"const": "Ensembl REST"},
+          "base_urls": {
+            "type": "array",
+            "items": {"type": "string"},
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "operations": {
+            "type": "array",
+            "items": {"enum": ["sequence/region", "map"]},
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "fields": {
+            "type": "array",
+            "items": {"enum": ["chromosome", "coordinates"]},
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "limitations": {"type": "array", "items": {"type": "string"}},
+    "provenance": {"type": "object"}
+  },
+  "$defs": {
+    "allele": {
+      "type": "object",
+      "required": ["chrom", "pos", "ref", "alt"],
+      "properties": {
+        "chrom": {"type": "string"},
+        "pos": {"type": "integer", "minimum": 1},
+        "ref": {"type": "string", "pattern": "^[ACGT]+$"},
+        "alt": {"type": "string", "pattern": "^[ACGT]+$"}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "liftover_ready"}}},
+      "then": {
+        "required": [
+          "operation",
+          "input",
+          "normalized_source",
+          "target",
+          "mapping",
+          "validation",
+          "remote_disclosures",
+          "limitations"
+        ]
+      }
+    },
+    {
+      "if": {"properties": {"status": {"enum": ["blocked", "service_failure"]}}},
+      "then": {"required": ["reason", "message", "classification"]}
+    }
+  ]
+}

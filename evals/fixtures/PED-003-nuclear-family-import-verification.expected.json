@@ -1,0 +1,56 @@
+{
+  "outcome": "rendered_and_exported_standalone_svg",
+  "generated_json": {
+    "format": "pedigree_studio_project_v1",
+    "required_keys_per_individual": [
+      "id",
+      "sex",
+      "affected",
+      "deceased",
+      "proband",
+      "adopted",
+      "carrier",
+      "genotypes"
+    ],
+    "empty_genotypes_value": {},
+    "proband_count": 1,
+    "deceased_ids": ["brother"],
+    "affected_ids": ["proband", "brother"]
+  },
+  "import": {
+    "supported_paths": [
+      "visible_open_button_with_prearmed_filechooser",
+      "direct_file_input_upload_without_click"
+    ],
+    "hidden_input_click_allowed": false,
+    "file_chooser_wait_armed_before_click": true,
+    "fit_view_after_load": true
+  },
+  "verification": [
+    "all five individuals drawn as symbols",
+    "three children attached to the single mating",
+    "proband and brother filled as affected",
+    "father, mother, and sister unfilled",
+    "proband marker on proband",
+    "deceased slash on brother"
+  ],
+  "svg_export": {
+    "path": "read_markup_and_build_outside_page",
+    "reason": "download_event_not_observable",
+    "repeat_export_clicks_allowed": false,
+    "clone_node_in_page_evaluation": false,
+    "raw_outer_html_allowed": false,
+    "required_root_attributes": ["xmlns", "width", "height", "viewBox"],
+    "background": "white",
+    "export_excluded_nodes_present": 0,
+    "verify_saved_artifact": true
+  },
+  "must_not": [
+    "omit genotypes from a generated individual",
+    "click the hidden file input to open the chooser",
+    "click the export control again when no download event is exposed",
+    "call cloneNode on the page-evaluation result",
+    "describe a screenshot as an exported SVG or PNG",
+    "describe a blank chart as an empty pedigree"
+  ]
+}

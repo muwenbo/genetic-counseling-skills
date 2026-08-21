@@ -27,12 +27,15 @@ The first release covers rare-disease constitutional/germline counseling:
 - structuring English or Chinese case narratives and proposing HPO terms;
 - inspecting and normalizing testing-company variant tables without trusting
   company annotations as independently verified;
+- filtering large local annotated germline callsets with reviewer-approved
+  fields and thresholds;
 - phenotype-only disease candidate ranking;
 - review-centered sequence-variant classification;
 - ACMG/ClinGen constitutional CNV classification;
 - variant and gene-disease literature review;
 - restrained interpretation of negative or VUS results;
-- drafting clinician-facing and optional patient-facing counseling summaries.
+- drafting clinician-facing and optional patient-facing counseling summaries;
+- drawing reviewable pedigree data and figures from user-supplied family facts.
 
 Out of scope for v1 are somatic oncology, pharmacogenomics, polygenic risk,
 standalone carrier or newborn-screening workflows, autonomous diagnosis, and
@@ -182,12 +185,14 @@ The initial skills are:
 
 - `prepare-rare-disease-case`
 - `review-variant-table`
+- `filter-variant-callset`
 - `rank-disease-candidates`
 - `classify-sequence-variant`
 - `classify-cnv`
 - `find-variant-literature`
 - `interpret-negative-or-vus`
 - `draft-counseling-summary`
+- `draw-pedigree`
 
 ## Upstream repositories
 

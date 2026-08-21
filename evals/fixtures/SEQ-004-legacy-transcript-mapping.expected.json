@@ -1,0 +1,23 @@
+{
+  "outcome": "map_through_exact_genomic_allele_before_annotation",
+  "mapping_service": "NCBI Variation",
+  "mapping_chain": [
+    "contextual_spdi",
+    "canonical_genomic_spdi",
+    "canonical_genomic_hgvs",
+    "vep_annotation"
+  ],
+  "preserve_asserted_transcript": true,
+  "fallback_trigger": "explicit_ensembl_unresolved_variant_response",
+  "require_single_contextual_allele": true,
+  "require_chromosome_accession_concordance": true,
+  "unreconciled_insertions": "blocked",
+  "service_failures_do_not_trigger_fallback": true,
+  "preserve_prior_remote_disclosures_on_later_failure": true,
+  "stop_on_allele_disagreement": true,
+  "must_not": [
+    "replace .2 with .3 by string substitution",
+    "infer equivalence from matching c. coordinates",
+    "treat mapping failure as an empty annotation"
+  ]
+}

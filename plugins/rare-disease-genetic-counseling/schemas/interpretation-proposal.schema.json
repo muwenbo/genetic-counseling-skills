@@ -27,23 +27,63 @@
       "type": ["string", "null"],
       "enum": ["Pathogenic", "Likely pathogenic", "Uncertain significance", "Likely benign", "Benign", null]
     },
+    "scoring_framework": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["name", "version", "thresholds"],
+      "properties": {
+        "name": {"type": "string"},
+        "version": {"type": "string", "minLength": 1},
+        "thresholds": {"type": "object", "additionalProperties": {"type": "string"}}
+      }
+    },
+    "pathogenic_subtotal": {"type": ["number", "null"]},
+    "benign_subtotal": {"type": ["number", "null"]},
+    "signed_total": {"type": ["number", "null"]},
     "point_total": {"type": ["number", "null"]},
+    "rule_based_tier": {
+      "type": ["string", "null"],
+      "enum": ["Pathogenic", "Likely pathogenic", "Uncertain significance", "Likely benign", "Benign", null]
+    },
+    "scoring_discrepancy": {"type": ["string", "null"]},
     "evidence": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "claim", "assessment", "direction", "source_type", "rationale"],
+        "required": ["direction", "source_type", "rationale"],
+        "anyOf": [
+          {"required": ["id", "claim", "assessment"]},
+          {
+            "required": [
+              "criterion",
+              "state",
+              "original_strength",
+              "effective_strength",
+              "points",
+              "evidence",
+              "limitations_or_missing_confirmation",
+              "confirmation_status"
+            ]
+          }
+        ],
         "properties": {
           "id": {"type": "string"},
           "claim": {"type": "string"},
           "assessment": {"enum": ["met", "not_met", "not_applicable", "not_evaluated", "supports", "contradicts", "context_only"]},
+          "criterion": {"type": "string"},
+          "state": {"enum": ["met", "not_met", "not_applicable", "not_evaluated"]},
+          "original_strength": {"type": ["string", "null"]},
+          "effective_strength": {"type": ["string", "null"]},
           "direction": {"enum": ["pathogenic", "benign", "neutral", "diagnostic_support", "diagnostic_contradiction"]},
           "strength": {"type": ["string", "null"]},
           "points": {"type": ["number", "null"]},
+          "evidence": {"type": "string"},
           "source_type": {"enum": ["user", "record", "engine", "guideline", "database", "literature", "model_inference"]},
           "source_ref": {"type": ["string", "null"]},
           "rationale": {"type": "string"},
+          "limitations_or_missing_confirmation": {"type": ["string", "null"]},
+          "confirmation_status": {"enum": ["confirmed", "reviewed", "unconfirmed", "not_applicable", "not_available"]},
           "requires_confirmation": {"type": "boolean", "default": false}
         }
       }
@@ -79,5 +119,32 @@
         }
       }
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "proposal_type": {"const": "sequence_classification"},
+          "status": {"const": "ready_for_review"}
+        }
+      },
+      "then": {
+        "required": [
+          "scoring_framework",
+          "pathogenic_subtotal",
+          "benign_subtotal",
+          "signed_total",
+          "rule_based_tier",
+          "proposed_tier",
+          "scoring_discrepancy"
+        ],
+        "properties": {
+          "scoring_framework": {"type": "object"},
+          "pathogenic_subtotal": {"type": "number"},
+          "benign_subtotal": {"type": "number"},
+          "signed_total": {"type": "number"}
+        }
+      }
+    }
+  ]
 }

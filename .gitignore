@@ -11,3 +11,9 @@ __pycache__/
 coverage.xml
 .coverage
 htmlcov/
+
+# Local pedigree rendering outputs; family-history artifacts must not be committed.
+/artifacts/
+/pedigree-*.json
+/pedigree-*.svg
+/pedigree_*.json

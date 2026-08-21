@@ -1,0 +1,6 @@
+{
+  "request": "annotate_sequence_variant",
+  "variant": "chr4-1808989-A-T",
+  "genome_build": "hg19",
+  "ref_alt_verified_on_declared_build": true
+}

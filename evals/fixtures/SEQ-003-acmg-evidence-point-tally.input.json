@@ -1,0 +1,7 @@
+{
+  "request": "classify_sequence_variant",
+  "variant": "NM_003041.4:c.1129+2T>C",
+  "disease_context": "SLC5A2-related familial renal glucosuria",
+  "inheritance": "unknown",
+  "requested_output": "ACMG evidence and scores"
+}

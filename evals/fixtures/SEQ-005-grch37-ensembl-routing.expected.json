@@ -1,0 +1,13 @@
+{
+  "outcome": "ready_for_grch37_ensembl_annotation",
+  "endpoint": "https://grch37.rest.ensembl.org",
+  "returned_assembly_required": "GRCh37",
+  "independent_ref_verification_operation": "GET /sequence/region/human/{region}",
+  "implicit_liftover": false,
+  "preserve_declared_build": true,
+  "must_not": [
+    "send GRCh37 coordinates to the GRCh38 endpoint",
+    "silently lift the allele to GRCh38",
+    "accept a returned GRCh38 assembly as concordant"
+  ]
+}

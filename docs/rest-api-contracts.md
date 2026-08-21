@@ -165,14 +165,54 @@ variant result.
 Sequence annotation reuses pinned upstream `variant-classifier` code through
 `scripts/upstream_variant_adapter.py`. For HGVS, rsID, and normalized GRCh38
 genomic input, upstream `vep_annotate.py` calls Ensembl REST operations under
-`https://rest.ensembl.org/vep/human/`. The adapter requires an explicit build for
-genomic input, refuses hg19 rather than inheriting GRCh38, uses a bounded timeout,
-preserves the upstream JSON summary, and records the exact Git commit. It sends
-only the scientific variant and no case narrative or identifiers.
+`https://rest.ensembl.org/vep/human/`. For normalized GRCh37 genomic input, the
+local bridge reuses the pinned VEP client and parser against
+`https://grch37.rest.ensembl.org/vep/human/`. The adapter requires an explicit
+build for every genomic representation, including `NC_...:g.` HGVS. Genomic
+HGVS must first be normalized to a verified VCF-style allele. For VCF-style
+input, the adapter retrieves reference sequence on the declared assembly and
+stops on REF mismatch before VEP. It preserves results on that assembly without
+implicit liftover, uses a bounded timeout, preserves the complete upstream JSON
+summary, and records the exact Git commit. Classification-shaped fields in the
+raw annotation remain preserved but quarantined; they never make the result
+classification-ready. It sends only the scientific variant or the minimized
+chromosome/coordinates needed for reference verification and no case narrative
+or identifiers.
+
+The adapter's `liftover` operation converts one simple VCF-style SNV/indel in
+either direction between GRCh37 and GRCh38. It calls the source and target
+Ensembl `sequence/region` endpoints plus
+`GET /map/human/{from_assembly}/{region}/{to_assembly}`. A successful result
+requires source REF verification, one contiguous length-preserving mapping,
+strand-aware allele projection, target REF verification and normalization, and
+a reverse mapping that recovers the normalized source interval. Mapping or
+transport failures are not converted alleles. Symbolic, breakend, MNV, complex
+delins, multi-allelic, ambiguous-base, mitochondrial, and structural variants
+are out of scope.
+
+For a versioned RefSeq transcript HGVS explicitly rejected as unresolved by
+current Ensembl VEP, the adapter may send that scientific variant to NCBI
+Variation at
+`https://api.ncbi.nlm.nih.gov/variation/v0`: `GET /hgvs/{hgvs}/contextuals`,
+`GET /spdi/{spdi}/canonical_representative`, and
+`GET /spdi/{canonical_spdi}/hgvs`. It requires one valid contextual allele and a
+canonical genomic RefSeq allele, preserves all intermediate representations,
+and submits the resulting genomic HGVS to VEP. It does not infer transcript
+equivalence from equal c. positions or modify accession versions by string
+replacement. Ambiguity, malformed responses, or allele disagreement stops the
+workflow.
+
+An Ensembl timeout, malformed response, rate limit, or execution failure does
+not trigger the NCBI fallback. It remains an Ensembl service failure, preserving
+the service, real endpoint operation, minimized fields disclosed, and retrieval
+time. NCBI mapping is attempted only after an explicit unresolved-variant
+response.
 
 VEP annotation is not normalization, liftover, independent REF verification, or
-classification. A timeout, malformed output, missing dependency, or commit
-mismatch is a service/capability failure rather than an absent annotation.
+classification. Independent REF verification for supported VCF-style genomic
+input is a separate `sequence/region` request made before VEP. A timeout,
+malformed output, missing dependency, or commit mismatch is a service/capability
+failure rather than an absent annotation.
 
 VCEP specification lookup reuses upstream `check_vcep_spec.py`, its registry,
 and selected guideline at the same commit. Upstream `classify_variant.py` is not

@@ -1,0 +1,15 @@
+{
+  "request": "draw_pedigree",
+  "requested_outputs": ["json", "svg", "editable_tab"],
+  "prepared_data": {
+    "format": "json",
+    "validation_status": "valid",
+    "contains_direct_identifiers": false
+  },
+  "browser": {
+    "selected_surface": "in_app_browser",
+    "available": true,
+    "supports_page_evaluation": true,
+    "supports_deliverable_tabs": true
+  }
+}

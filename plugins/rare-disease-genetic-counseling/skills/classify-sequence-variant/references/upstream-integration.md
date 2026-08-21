@@ -23,7 +23,8 @@ failure, not an empty annotation or a negative clinical result.
 
 ## Annotation
 
-For an already normalized and independently checked GRCh38 allele:
+For a VCF-style genomic allele (the adapter independently checks REF against the
+declared assembly before VEP):
 
 ```bash
 python3 "$SKILL_DIR/scripts/upstream_variant_adapter.py" annotate \
@@ -33,14 +34,60 @@ python3 "$SKILL_DIR/scripts/upstream_variant_adapter.py" annotate \
 Transcript HGVS and rsIDs may be submitted without `--genome-build`, but the
 returned genomic representation is still an annotation proposal that must be
 reconciled with the asserted variant. Genomic input always requires an explicit
-build. The adapter refuses hg19 genomic input because the upstream script calls
-the GRCh38 Ensembl endpoint and performs no liftover.
+build, including genomic RefSeq HGVS (`NC_...:g.`). Normalize genomic HGVS to a
+verified VCF-style allele before calling the adapter. The adapter routes `hg38`
+to `https://rest.ensembl.org` and `hg19` to
+`https://grch37.rest.ensembl.org`. The GRCh37 bridge reuses the pinned upstream
+VEP client and response parser without modifying vendored code. It preserves
+GRCh37 output and performs no implicit liftover.
 
-The adapter discloses only the scientific variant to `rest.ensembl.org`. It
-preserves the upstream JSON summary, returned assembly, representation
-concordance, endpoint provenance, and exact upstream commit. It always reports
-`ref_alt_independently_verified: false`: VEP output is not an independent
-reference-allele check.
+## Sequence-allele liftover
+
+The adapter exposes `liftover` for one simple VCF-style SNV/indel:
+
+```bash
+python3 "$SKILL_DIR/scripts/upstream_variant_adapter.py" liftover \
+  "chr4-1808989-A-T" --from-build hg19 --to-build hg38
+```
+
+It calls the assembly-specific Ensembl `sequence/region` and
+`map/human/{from_assembly}/{region}/{to_assembly}` operations. It verifies and
+normalizes the source allele, requires one contiguous length-preserving mapping,
+reverse-complements alleles for a negative-strand mapping, verifies and
+normalizes target REF/ALT, and maps the target interval back to the source.
+
+Accept only `status: liftover_ready` with both REF checks and
+`roundtrip_concordant: true`. Zero, multiple, split, reference-discordant, or
+non-round-tripping mappings stop. Symbolic, breakend, MNV, complex delins,
+multi-allelic, ambiguous-base, mitochondrial, and structural variants are
+unsupported.
+
+If Ensembl explicitly rejects a versioned RefSeq transcript HGVS as unresolved,
+the adapter submits only that scientific HGVS to NCBI Variation and follows
+these real operations:
+
+1. `GET /variation/v0/hgvs/{hgvs}/contextuals` for one valid transcript SPDI;
+2. `GET /variation/v0/spdi/{spdi}/canonical_representative` for the canonical
+   genomic SPDI;
+3. `GET /variation/v0/spdi/{canonical_spdi}/hgvs` for genomic HGVS;
+4. upstream `vep_annotate.py` on that genomic HGVS.
+
+The output preserves the asserted HGVS, transcript and genomic SPDIs, genomic
+HGVS, endpoints, retrieval time, and the annotation input. A current transcript
+reported by VEP is equivalent only through the same genomic allele. Mapping
+failure, multiple contextual alleles, a non-genomic canonical result, or allele
+disagreement is a service failure or hard stop, never permission to edit the
+accession version manually. Ensembl timeouts, malformed output, rate limits, and
+execution failures do not trigger NCBI fallback.
+
+The adapter discloses only the scientific variant to the assembly-specific
+Ensembl REST endpoint and,
+when transcript-version resolution is required, `api.ncbi.nlm.nih.gov`. It
+preserves the complete upstream JSON summary, returned assembly, representation
+concordance, endpoint provenance, and exact upstream commit. It reports whether
+a VCF-style REF was independently verified before VEP. Classification-shaped
+fields are retained for raw-response fidelity but quarantined from
+interpretation, and `classification_ready` remains false.
 
 ## VCEP lookup
 
@@ -69,9 +116,7 @@ corroborating result.
 
 ## Distribution status
 
-The upstream README declares MIT, but the pinned repository has no standalone
-`LICENSE` file. Developer-preview use is recorded; public redistribution remains
-blocked until the license grant and required notice text are explicit. Codex
-plugin installation also caches only the plugin directory, so an unavailable
-root-level submodule must remain a visible capability failure until packaging is
-resolved.
+The pinned commit includes a standalone MIT `LICENSE`. Codex plugin installation
+still caches only the plugin directory, so an unavailable root-level submodule
+must remain a visible capability failure until packaging is resolved or the
+dependency is distributed through a reviewed, license-compliant mechanism.

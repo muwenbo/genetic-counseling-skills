@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate a 6-column PED file against Pedigree Studio's import rules.
 
-Pedigree Studio (assets/pedigree-studio.html) parses PED as:
+Pedigree Studio (assets/pedigree-chart.html) parses PED as:
   whitespace-split rows, columns = FamilyID IndividualID PaternalID MaternalID Sex Affection
   Sex:       1=male 2=female 0=unknown
   Affection: 1=unaffected 2=affected 0=unknown

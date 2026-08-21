@@ -1,0 +1,23 @@
+{
+  "request": "draw_pedigree",
+  "requested_outputs": ["json", "svg"],
+  "family": {
+    "individuals": [
+      {"id": "father", "sex": "male", "affected": "unaffected", "deceased": false, "proband": false},
+      {"id": "mother", "sex": "female", "affected": "unaffected", "deceased": false, "proband": false},
+      {"id": "proband", "sex": "male", "affected": "affected", "deceased": false, "proband": true},
+      {"id": "sister", "sex": "female", "affected": "unaffected", "deceased": false, "proband": false},
+      {"id": "brother", "sex": "male", "affected": "affected", "deceased": true, "proband": false}
+    ],
+    "matings": [{"id": "m1", "partners": ["father", "mother"], "consanguineous": false}],
+    "children": ["proband", "sister", "brother"],
+    "variants": []
+  },
+  "browser": {
+    "selected_surface": "in_app_browser",
+    "available": true,
+    "loopback_http_allowed": true,
+    "supports_page_evaluation": true,
+    "download_event_observable": false
+  }
+}

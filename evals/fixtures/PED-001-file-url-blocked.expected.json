@@ -1,0 +1,16 @@
+{
+  "outcome": "ready_for_loopback_rendering",
+  "navigation_scheme": "http",
+  "bind_host": "127.0.0.1",
+  "served_content": ["bundled_pedigree_chart_html"],
+  "family_data_transport": "browser_file_upload",
+  "cleanup": ["stop_temporary_server"],
+  "fallback_if_loopback_fails": "return_validated_json_and_report_figure_not_generated",
+  "must_not": [
+    "navigate to a file URL",
+    "put family data in the URL or served directory",
+    "bind the temporary server to a non-loopback interface",
+    "upload family data to a remote renderer",
+    "claim that an SVG was generated after rendering failed"
+  ]
+}

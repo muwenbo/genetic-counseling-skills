@@ -10,11 +10,12 @@ treating automated output as a clinical verdict.
 Current design artifacts:
 
 - `docs/architecture.md` — component boundaries and integration policy
-- `docs/skill-contracts.md` — user-facing workflow contracts for the first eight skills
+- `docs/skill-contracts.md` — user-facing workflow contracts for the first ten skills
 - `docs/rest-api-contracts.md` — REST endpoints wrapped by the skills
 - `plugins/rare-disease-genetic-counseling/schemas/case-context.schema.json` — shared phenotype and case representation
 - `plugins/rare-disease-genetic-counseling/schemas/interpretation-proposal.schema.json` — auditable classification and hypothesis output
 - `plugins/rare-disease-genetic-counseling/schemas/sequence-annotation.schema.json` — pinned upstream annotation envelope and validation state
+- `plugins/rare-disease-genetic-counseling/schemas/sequence-liftover.schema.json` — audited GRCh37/GRCh38 simple-allele conversion
 - `plugins/rare-disease-genetic-counseling/schemas/variant-table-review.schema.json` — auditable laboratory-table inspection and mapping
 - `evals/manifest.json` — acceptance fixtures derived from independent examples
 

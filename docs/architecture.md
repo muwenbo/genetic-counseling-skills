@@ -59,12 +59,12 @@ The public knowledge-graph endpoint is `https://rdkg.viknox.com.cn`.
 | Optional variant-backed gene ranking | user-supplied prioritization result | imported result | Keep external rank distinct from clinical conclusion; expose inheritance and phenotype evidence |
 | Local callset filtering | bundled local script plus skill reasoning | local file workflow | Filter an annotated callset with reviewer-approved criteria into an imported prioritization result; filter only on file-supplied annotations; never run as an automatic fallback from ranking |
 | Variant normalization | `hgvs-tools` | planned local HTTP service | Require explicit assembly for genomic input; independently verify REF before classification |
-| Sequence annotation | pinned `variant-classifier` `vep_annotate.py` | local safety adapter calling Ensembl REST | Reuse upstream code without modifying it; require normalized GRCh38 genomic input; preserve returned annotation and never claim VEP independently verified REF/ALT |
+| Sequence annotation and liftover | pinned `variant-classifier` VEP client/parser, Ensembl assembly map, plus NCBI Variation transcript mapping | local safety adapter calling assembly-specific Ensembl REST services | Reuse upstream code without modifying it; route declared GRCh38 and GRCh37 coordinates to matching VEP endpoints; convert simple alleles only with source/target REF verification and round-trip mapping; resolve unsupported versioned RefSeq HGVS through one canonical genomic allele; preserve every representation |
 | Sequence evidence engine | `acmg-auto-classifier` | local HTTP service | Label output as automated and incomplete; build a reviewable proposal |
 | VCEP guidance | `vcep-classification-skills` | immutable Git submodule | Select disease/inheritance-specific specification and record exact commit/version |
 | CNV classification | `cnvclassifier.viknox.com` | remote HTTPS API | Minimize payload, require build, preserve liftover and complete evidence trail |
 | Literature | PubMed/PMC via upstream paper finder plus discovery adapter | remote retrieval | Distinguish discovery from PMID fetch; preserve licensing and evidence extraction provenance |
-| Pedigree charting | bundled offline Pedigree Studio tool plus skill reasoning | local file and browser workflow | Generate a reviewable PED/JSON project and export the figure locally; never infer relatives, phenotypes, or genotypes |
+| Pedigree charting | bundled Pedigree Studio tool plus skill reasoning | local file and loopback-browser workflow | Generate a reviewable PED/JSON project, serve only the pinned application shell on `127.0.0.1`, export locally when browser capabilities permit, and degrade explicitly to data-only output; never infer relatives, phenotypes, or genotypes |
 
 ## Non-negotiable correctness boundaries
 
@@ -121,10 +121,10 @@ preservation, and the distinction between failure and an empty lookup.
 
 The upstream automatic classifier is not executed because its consequence-only
 PVS1, absent-frequency PM2, and binary evidence behavior conflict with this
-plugin's clinical guardrails. The upstream README declares MIT, but no standalone
-license file is present; public redistribution remains blocked pending explicit
-license text. Root-level submodules are also not copied into the Codex plugin
-cache, so public packaging of the dependency remains a release gate.
+plugin's clinical guardrails. The pinned commit includes a standalone MIT
+`LICENSE`. Root-level submodules are not copied into the Codex plugin cache, so
+public packaging of the dependency remains a release gate until the dependency
+is distributed through a reviewed, license-compliant mechanism.
 
 An update automation may:
 
@@ -143,6 +143,8 @@ The local preview may proceed once all acceptance fixtures pass. A public
 release additionally requires:
 
 - explicit licenses for bundled/copied code and data;
+- retained third-party notices and reproducible source provenance for bundled
+  Pedigree Studio assets;
 - documented privacy and data-retention behavior for every remote service;
 - secure configuration for any API credentials introduced later;
 - pinned reference/guideline versions;

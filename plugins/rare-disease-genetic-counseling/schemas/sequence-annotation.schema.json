@@ -62,33 +62,45 @@
         }
       }
     },
-    "remote_disclosure": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "service",
-        "base_url",
-        "fields"
-      ],
-      "properties": {
-        "service": {
-          "const": "Ensembl REST"
-        },
-        "base_url": {
-          "const": "https://rest.ensembl.org"
-        },
-        "fields": {
-          "type": "array",
-          "prefixItems": [
-            {
-              "const": "variant"
-            }
-          ],
-          "items": false,
-          "minItems": 1,
-          "maxItems": 1
+    "remote_disclosures": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["service", "base_url", "fields"],
+        "properties": {
+          "service": {
+            "enum": ["NCBI Variation", "Ensembl REST"]
+          },
+          "base_url": {
+            "enum": [
+              "https://api.ncbi.nlm.nih.gov/variation/v0",
+              "https://grch37.rest.ensembl.org",
+              "https://rest.ensembl.org"
+            ]
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "enum": ["chromosome", "coordinates", "scientific_variant", "variant"]
+            },
+            "minItems": 1,
+            "maxItems": 3,
+            "uniqueItems": true
+          },
+          "operations": {
+            "type": "array",
+            "items": {"type": "string"},
+            "minItems": 1,
+            "uniqueItems": true
+          }
         }
       }
+    },
+    "transcript_mapping": {
+      "type": ["object", "null"],
+      "additionalProperties": true
     },
     "annotation": {
       "type": "object",
@@ -103,6 +115,7 @@
         "returned_representation_concordant",
         "ref_alt_independently_verified",
         "classification_ready",
+        "contains_upstream_classification_fields",
         "annotation_source",
         "annotation_source_expected",
         "annotation_source_concordant"
@@ -124,10 +137,13 @@
           ]
         },
         "ref_alt_independently_verified": {
-          "const": false
+          "type": "boolean"
         },
         "classification_ready": {
           "const": false
+        },
+        "contains_upstream_classification_fields": {
+          "type": "boolean"
         },
         "annotation_source": {
           "type": [
@@ -151,28 +167,33 @@
     },
     "provenance": {
       "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "repository",
-        "commit",
-        "operation",
-        "retrieved_at"
-      ],
-      "properties": {
-        "repository": {
-          "const": "https://github.com/muwenbo/vcep-classification-skills"
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "required": ["repository", "commit", "operation", "retrieved_at"],
+          "properties": {
+            "repository": {"const": "https://github.com/muwenbo/vcep-classification-skills"},
+            "commit": {"const": "05bf1f6bce4e6be04f9e52b55db1d5fee03029d9"},
+            "operation": {"type": "string"},
+            "retrieved_at": {"type": "string", "format": "date-time"}
+          }
         },
-        "commit": {
-          "const": "05bf1f6bce4e6be04f9e52b55db1d5fee03029d9"
-        },
-        "operation": {
-          "type": "string"
-        },
-        "retrieved_at": {
-          "type": "string",
-          "format": "date-time"
+        {
+          "additionalProperties": false,
+          "required": ["service", "base_url", "operations", "retrieved_at"],
+          "properties": {
+            "service": {"enum": ["NCBI Variation", "Ensembl REST"]},
+            "base_url": {
+              "oneOf": [
+                {"type": "string"},
+                {"type": "array", "items": {"type": "string"}, "minItems": 1}
+              ]
+            },
+            "operations": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+            "retrieved_at": {"type": "string", "format": "date-time"}
+          }
         }
-      }
+      ]
     }
   },
   "allOf": [
@@ -191,7 +212,8 @@
         "required": [
           "operation",
           "input",
-          "remote_disclosure",
+          "remote_disclosures",
+          "transcript_mapping",
           "annotation",
           "validation",
           "limitations"
@@ -216,6 +238,27 @@
           "message",
           "classification"
         ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {"const": "annotation_ready"},
+          "input": {
+            "properties": {"notation_type": {"const": "genomic"}}
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "validation": {
+            "properties": {
+              "assembly_concordant": {"const": true},
+              "returned_representation_concordant": {"const": true},
+              "ref_alt_independently_verified": {"const": true}
+            }
+          }
+        }
       }
     }
   ]

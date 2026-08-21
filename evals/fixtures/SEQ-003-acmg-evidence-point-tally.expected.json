@@ -1,0 +1,47 @@
+{
+  "outcome": "classification_proposal_with_explicit_tally",
+  "criterion_table_required": true,
+  "criterion_fields": [
+    "criterion",
+    "state",
+    "original_strength",
+    "effective_strength",
+    "points",
+    "evidence",
+    "rationale",
+    "limitations_or_missing_confirmation",
+    "confirmation_status"
+  ],
+  "zero_point_criteria_remain_visible": true,
+  "required_totals": [
+    "pathogenic_subtotal",
+    "benign_subtotal",
+    "signed_total"
+  ],
+  "required_interpretation": [
+    "scoring framework and version",
+    "tier threshold reached",
+    "rule-based ACMG/AMP combination",
+    "proposed tier",
+    "missing evidence that could change the score"
+  ],
+  "default_scoring_framework": {
+    "name": "Bayesian ACMG/AMP point calibration",
+    "version": "Tavtigian et al. 2020",
+    "pmid": "32720330",
+    "doi": "10.1002/humu.24088"
+  },
+  "bayesian_acmg_amp_thresholds": {
+    "Pathogenic": ">=10",
+    "Likely pathogenic": "6-9",
+    "Uncertain significance": "0-5",
+    "Likely benign": "-1 to -6",
+    "Benign": "<=-7"
+  },
+  "must_not": [
+    "double count correlated evidence",
+    "omit not_evaluated criteria",
+    "treat a missing field as negative evidence",
+    "silently resolve disagreement between point and combining-rule tiers"
+  ]
+}

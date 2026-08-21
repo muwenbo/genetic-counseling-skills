@@ -1,0 +1,15 @@
+{
+  "request": "draw_pedigree",
+  "requested_outputs": ["json", "svg"],
+  "prepared_data": {
+    "format": "json",
+    "validation_status": "valid",
+    "contains_direct_identifiers": false
+  },
+  "browser": {
+    "selected_surface": "in_app_browser",
+    "available": true,
+    "file_url_allowed": false,
+    "loopback_http_allowed": true
+  }
+}

@@ -14,6 +14,30 @@
       "expected": "fixtures/SEQ-002-pinned-upstream-annotation.expected.json"
     },
     {
+      "id": "SEQ-003-acmg-evidence-point-tally",
+      "skill": "classify-sequence-variant",
+      "input": "fixtures/SEQ-003-acmg-evidence-point-tally.input.json",
+      "expected": "fixtures/SEQ-003-acmg-evidence-point-tally.expected.json"
+    },
+    {
+      "id": "SEQ-004-legacy-transcript-mapping",
+      "skill": "classify-sequence-variant",
+      "input": "fixtures/SEQ-004-legacy-transcript-mapping.input.json",
+      "expected": "fixtures/SEQ-004-legacy-transcript-mapping.expected.json"
+    },
+    {
+      "id": "SEQ-005-grch37-ensembl-routing",
+      "skill": "classify-sequence-variant",
+      "input": "fixtures/SEQ-005-grch37-ensembl-routing.input.json",
+      "expected": "fixtures/SEQ-005-grch37-ensembl-routing.expected.json"
+    },
+    {
+      "id": "SEQ-006-bidirectional-liftover",
+      "skill": "classify-sequence-variant",
+      "input": "fixtures/SEQ-006-bidirectional-liftover.input.json",
+      "expected": "fixtures/SEQ-006-bidirectional-liftover.expected.json"
+    },
+    {
       "id": "CNV-001-missing-build",
       "skill": "classify-cnv",
       "input": "fixtures/CNV-001-missing-build.input.json",
@@ -48,6 +72,24 @@
       "skill": "prepare-rare-disease-case",
       "input": "fixtures/HPO-002-chinese-translation-agent-verified.input.json",
       "expected": "fixtures/HPO-002-chinese-translation-agent-verified.expected.json"
+    },
+    {
+      "id": "PED-001-file-url-blocked",
+      "skill": "draw-pedigree",
+      "input": "fixtures/PED-001-file-url-blocked.input.json",
+      "expected": "fixtures/PED-001-file-url-blocked.expected.json"
+    },
+    {
+      "id": "PED-002-standalone-svg-editable-tab",
+      "skill": "draw-pedigree",
+      "input": "fixtures/PED-002-standalone-svg-editable-tab.input.json",
+      "expected": "fixtures/PED-002-standalone-svg-editable-tab.expected.json"
+    },
+    {
+      "id": "PED-003-nuclear-family-import-verification",
+      "skill": "draw-pedigree",
+      "input": "fixtures/PED-003-nuclear-family-import-verification.input.json",
+      "expected": "fixtures/PED-003-nuclear-family-import-verification.expected.json"
     }
   ]
 }

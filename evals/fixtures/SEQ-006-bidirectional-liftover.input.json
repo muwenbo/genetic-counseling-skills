@@ -1,0 +1,6 @@
+{
+  "request": "liftover_sequence_variant",
+  "variant": "chr4-1808989-A-T",
+  "from_build": "hg19",
+  "to_build": "hg38"
+}

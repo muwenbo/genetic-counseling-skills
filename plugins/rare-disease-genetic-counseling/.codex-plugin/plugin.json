@@ -1,16 +1,16 @@
 {
   "name": "rare-disease-genetic-counseling",
-  "version": "0.1.0+codex.20260818085038",
-  "description": "Review-centered workflows for rare-disease germline case preparation, laboratory variant-table review, candidate ranking, variant and CNV interpretation, literature review, and counseling drafts.",
+  "version": "0.1.0+codex.20260821090419",
+  "description": "Review-centered workflows for rare-disease germline case preparation, variant-table and callset review, pedigree drawing, candidate ranking, variant and CNV interpretation, literature review, and counseling drafts.",
   "author": {
-    "name": "Local developer"
+    "name": "muwenbo"
   },
   "skills": "./skills/",
   "interface": {
     "displayName": "Rare Disease Genetic Counseling",
     "shortDescription": "Rare-disease germline counseling workflows.",
-    "longDescription": "Prepare rare-disease cases, review laboratory variant tables, rank candidates, build reviewable sequence and CNV interpretation proposals, find literature, assess negative or VUS results, and draft counseling summaries. Automated output always requires qualified human review.",
-    "developerName": "Local developer",
+    "longDescription": "Prepare rare-disease cases, review laboratory variant tables, filter annotated local callsets, draw pedigrees, rank candidates, build reviewable sequence and CNV interpretation proposals, find literature, assess negative or VUS results, and draft counseling summaries. Automated output always requires qualified human review.",
+    "developerName": "muwenbo",
     "category": "Healthcare",
     "capabilities": [],
     "defaultPrompt": "Help me prepare and review a rare-disease germline case without overcalling the evidence."

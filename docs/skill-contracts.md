@@ -230,43 +230,80 @@ proposal for one constitutional sequence variant and one disease context.
 
 **Workflow**
 
+0. When only coordinate conversion is requested, accept one simple VCF-style
+   SNV/indel and explicit source/target builds without requiring disease context.
+   Verify and normalize source REF, require one contiguous Ensembl assembly
+   mapping, handle strand, verify and normalize target REF/ALT, and require a
+   concordant reverse mapping. Return a conversion artifact, not a classification.
 1. Parse without changing the asserted variant.
 2. Require genome build for genomic coordinates.
+   Treat genomic RefSeq HGVS (`NC_...:g.`) as genomic input and normalize it to
+   one verified VCF-style allele before bundled annotation; stop if that
+   normalization capability is unavailable.
 3. Verify the pinned `vcep-classification-skills` dependency and exact commit.
    Dependency failure is not an empty annotation.
-4. Normalize to GRCh38 and verify chromosome, position, REF, and ALT against a
-   reference source; preserve the original representation.
-5. Reuse upstream `vep_annotate.py` through the local safety adapter. Preserve
-   the returned annotation and do not treat VEP as independent REF verification.
-6. Resolve transcript, gene, disease, inheritance, zygosity, and phase gaps.
-7. Retrieve additional population evidence without converting missing fields to
+4. For genomic input, route GRCh38 and GRCh37 coordinates to their matching
+   Ensembl REST endpoints without implicit liftover. Verify chromosome,
+   position, REF, and ALT on the declared assembly with a reference-sequence
+   request separate from VEP, and preserve the original representation.
+5. When Ensembl explicitly rejects a versioned RefSeq transcript HGVS as
+   unresolved,
+   map it through NCBI Variation contextual SPDI to exactly one canonical GRCh38
+   genomic allele. Preserve the asserted and mapped representations; never
+   replace a transcript version suffix or infer equivalence from c. coordinates.
+   A timeout, malformed response, rate limit, or execution failure remains an
+   Ensembl service failure and does not trigger NCBI disclosure.
+6. Reuse upstream `vep_annotate.py` through the local safety adapter. Preserve
+   the complete returned annotation and do not treat VEP as independent REF
+   verification. Quarantine any classification-shaped fields from clinical
+   interpretation while keeping them in the raw response.
+7. Resolve transcript, gene, disease, inheritance, zygosity, and phase gaps.
+8. Retrieve additional population evidence without converting missing fields to
    absence.
-8. Reuse upstream `check_vcep_spec.py` and registry, then select the applicable
+9. Reuse upstream `check_vcep_spec.py` and registry, then select the applicable
    VCEP document by gene, disease, and inheritance;
    record its version and submodule commit.
-9. Evaluate all criteria as `met`, `not_met`, `not_applicable`, or
-   `not_evaluated`, with strength and evidence provenance.
-10. Do not use upstream `classify_variant.py`; compare only a separately
+10. Evaluate all criteria as `met`, `not_met`, `not_applicable`, or
+   `not_evaluated`, with original and effective strength, signed point effect,
+   rationale, confirmation status, and evidence provenance. Keep zero-point
+   criteria visible.
+11. Do not use upstream `classify_variant.py`; compare only a separately
     validated engine output with the independently assembled proposal.
-11. Present the proposal and unresolved evidence for human review.
+12. Present a criterion table by default, followed by the scoring
+    framework/version, pathogenic and benign subtotals, signed total, tier
+    threshold, rule-based ACMG/AMP combination, proposed tier, and unresolved
+    evidence for human review. Use an applicable VCEP point system when one is
+    specified; otherwise label the Tavtigian et al. 2020 Bayesian ACMG/AMP point
+    calibration. Surface
+    disagreements between point and combining-rule results and avoid correlated
+    double counting.
 
 **Outputs**
 
 - normalized variant and validation status;
-- `classification_proposal` with criteria and point tally;
+- `classification_proposal` with a complete criterion table, signed point
+  tally, scoring framework/version, threshold interpretation, and rule-based
+  ACMG/AMP combination;
 - engine comparison;
 - missing evidence and review questions.
 
 **Hard stops**
 
 - missing genomic build;
+- genomic HGVS that cannot be normalized to one independently verified
+  VCF-style allele;
 - REF mismatch or ambiguous/multiple normalization without disambiguation;
+- returned VEP assembly differs from the declared genomic build;
+- liftover REF mismatch, zero/multiple/split mapping, target-reference
+  disagreement, or failed reverse mapping;
+- ambiguous transcript-version mapping or mapped/current allele disagreement;
 - missing disease/inheritance context where it affects criteria or VCEP choice;
 - unreliable liftover;
 - unsupported mitochondrial, mosaic, complex, or structural representation.
 
 **Must not** apply PVS1 from consequence alone, use absence from gnomAD as proof
-of pathogenicity, infer phase or de novo status, or submit a classification.
+of pathogenicity, infer phase or de novo status, submit a classification, or
+represent coordinate-only mapping as a verified allele conversion.
 
 ## `classify-cnv`
 
@@ -412,3 +449,61 @@ risk would require missing penetrance/parental information.
 
 **Must not** provide a definitive diagnosis from a VUS, give unsupported numeric
 recurrence risk, or present automated text as a signed clinical report.
+
+## `draw-pedigree`
+
+**Goal:** Convert user-supplied family-history facts into a reviewable PED/JSON
+project and, when local browser capabilities permit, a pedigree figure.
+
+**Inputs**
+
+- supplied relatives, relationships, sex, affection, and optional proband,
+  deceased, carrier, adoption, twin, consanguinity, or genotype facts;
+- optional existing PED or Pedigree Studio JSON project;
+- requested output format and figure type.
+
+**Workflow**
+
+1. Preserve supplied facts and represent unstated sex, affection, relationships,
+   and genotypes as unknown rather than inferred.
+2. Choose PED for structure and affection only; choose JSON when richer pedigree
+   annotations are required.
+3. Validate PED before rendering and retain reviewable source data in either
+   format.
+4. When a figure is requested, serve only the bundled, version-pinned Pedigree
+   Studio application shell from a temporary server bound to `127.0.0.1` and
+   navigate with `http://`; never navigate to the local asset with `file://`.
+5. Generate JSON individuals with the complete key set, including an explicit
+   `genotypes` object, so the import cannot depend on editor-side defaults.
+6. Load the PED/JSON through the application's visible import control with a
+   pre-armed file chooser, or use a browser controller's direct file-input upload
+   operation without clicking the hidden input. Fit the view and verify labels,
+   relationships, affected states, proband marker, and deceased marker against
+   the source data.
+7. Export a standalone SVG using the application's export control, or — when the
+   download cannot be observed — by reading the rendered markup and dimensions and
+   assembling the file outside the page; raw inline `outerHTML` is not a valid
+   export path, and a screenshot is not an export.
+8. Preserve the loaded editor tab as a user-facing deliverable for direct edits,
+   then stop the temporary server without closing the self-contained page.
+9. If browser or loopback navigation is unavailable, return the validated data
+   file and explicitly state that no figure was generated.
+
+**Outputs**
+
+- validated PED or Pedigree Studio JSON;
+- exported SVG/PNG, or a screenshot labelled as a preview, only when rendering
+  and verification succeeded;
+- retained editable Pedigree Studio tab when the browser supports deliverables;
+- explicit unknown fields and rendering capability status.
+
+**Stop or qualify when** relationships conflict, required identifiers are not
+unique, the PED/JSON is invalid, the selected browser is unavailable, loopback
+HTTP is rejected, or the rendered chart cannot be verified.
+
+**Must not** infer relatives, phenotype, genotype, phase, or segregation; place
+family data in a URL or served directory; expose the server beyond loopback;
+retry with a disallowed URL scheme; upload data to a remote renderer; repeatedly
+click the export control when no download event is exposed; describe a screenshot
+as an exported SVG or PNG; or describe a rendering failure as an empty or
+successfully generated pedigree.

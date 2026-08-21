@@ -1,0 +1,22 @@
+{
+  "outcome": "liftover_ready",
+  "required_validation": [
+    "source_ref_verified",
+    "single_contiguous_mapping",
+    "target_ref_verified",
+    "roundtrip_concordant"
+  ],
+  "preserve": [
+    "asserted_variant",
+    "normalized_source",
+    "forward_mapping",
+    "target_allele",
+    "reverse_mapping",
+    "strand"
+  ],
+  "must_not": [
+    "return coordinate-only mapping as a verified allele",
+    "accept multiple or split mappings",
+    "ignore source or target REF mismatch"
+  ]
+}
