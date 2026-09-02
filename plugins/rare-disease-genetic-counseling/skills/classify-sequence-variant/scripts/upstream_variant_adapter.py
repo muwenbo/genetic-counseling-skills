@@ -9,6 +9,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -22,6 +23,8 @@ UPSTREAM_REPOSITORY = "https://github.com/muwenbo/vcep-classification-skills"
 EXPECTED_COMMIT = "05bf1f6bce4e6be04f9e52b55db1d5fee03029d9"
 UPSTREAM_SKILL_RELATIVE = Path("plugins/variant-classifier/skills/variant-classifier")
 DEFAULT_VENDOR_RELATIVE = Path("vendor/vcep-classification-skills")
+DEFAULT_CACHE_DIRECTORY = "rare-disease-genetic-counseling"
+PINNED_CHECKOUT_DIRECTORY = f"vcep-classification-skills-{EXPECTED_COMMIT}"
 ENSEMBL_REST_URL = "https://rest.ensembl.org"
 ENSEMBL_GRCH37_REST_URL = "https://grch37.rest.ensembl.org"
 NCBI_VARIATION_URL = "https://api.ncbi.nlm.nih.gov/variation/v0"
@@ -66,6 +69,22 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+def dependency_cache_root(explicit: str | None = None) -> Path:
+    """Return the non-clinical local cache used for an approved pinned checkout."""
+    if explicit:
+        return Path(explicit).expanduser()
+    configured = os.environ.get("RARE_DISEASE_VCEP_CACHE_ROOT")
+    if configured:
+        return Path(configured).expanduser()
+    xdg_cache = os.environ.get("XDG_CACHE_HOME")
+    base = Path(xdg_cache).expanduser() if xdg_cache else Path.home() / ".cache"
+    return base / DEFAULT_CACHE_DIRECTORY
+
+
+def cached_dependency_path(cache_root: str | None = None) -> Path:
+    return dependency_cache_root(cache_root) / PINNED_CHECKOUT_DIRECTORY
+
+
 def dependency_candidates(explicit: str | None) -> list[Path]:
     if explicit:
         return [Path(explicit).expanduser()]
@@ -73,7 +92,7 @@ def dependency_candidates(explicit: str | None) -> list[Path]:
     if environment_root:
         return [Path(environment_root).expanduser()]
 
-    candidates: list[Path] = []
+    candidates: list[Path] = [cached_dependency_path()]
     for origin in (Path.cwd(), Path(__file__).resolve()):
         start = origin if origin.is_dir() else origin.parent
         for parent in (start, *start.parents):
@@ -193,6 +212,8 @@ def status_payload(explicit: str | None = None) -> tuple[dict[str, Any], int]:
                 "supported_operations": [],
                 "classification_engine_enabled": False,
                 "license_status": "pinned_mit_license_expected_dependency_unavailable",
+                "approved_setup_available": True,
+                "setup_operation": "prepare --allow-network-install",
             },
             3,
         )
@@ -218,6 +239,180 @@ def status_payload(explicit: str | None = None) -> tuple[dict[str, Any], int]:
         },
         0,
     )
+
+
+def run_git_command(arguments: Sequence[str], timeout_seconds: int) -> None:
+    """Run a bounded, non-interactive Git command without emitting remote output."""
+    environment = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "GIT_TERMINAL_PROMPT": "0",
+        "GIT_CONFIG_COUNT": "1",
+        "GIT_CONFIG_KEY_0": "credential.helper",
+        "GIT_CONFIG_VALUE_0": "",
+    }
+    try:
+        result = subprocess.run(
+            ["git", *arguments],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=timeout_seconds,
+            env=environment,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise AdapterError(
+            "dependency_install_timeout", "The pinned dependency download timed out."
+        ) from exc
+    except OSError as exc:
+        raise AdapterError(
+            "dependency_install_unavailable", "Git is unavailable for dependency setup."
+        ) from exc
+    if result.returncode != 0:
+        raise AdapterError(
+            "dependency_install_failed",
+            "Git could not retrieve or check out the pinned dependency commit.",
+        )
+
+
+def validate_prepared_dependency(repository_root: Path) -> Dependency:
+    normalized = normalize_dependency_root(repository_root)
+    if not normalized:
+        raise AdapterError(
+            "upstream_layout_invalid",
+            "The downloaded checkout does not contain the required resources.",
+        )
+    root, skill_root = normalized
+    commit = git_commit(root)
+    if commit != EXPECTED_COMMIT:
+        raise AdapterError(
+            "upstream_commit_mismatch",
+            f"The downloaded checkout is not pinned to required commit {EXPECTED_COMMIT}.",
+        )
+    required = (
+        root / "LICENSE",
+        skill_root / "scripts/vep_annotate.py",
+        skill_root / "scripts/check_vcep_spec.py",
+        skill_root / "data/vcep_registry.json",
+    )
+    if not all(path.is_file() for path in required):
+        raise AdapterError(
+            "upstream_layout_invalid",
+            "The downloaded checkout is missing its license or required resources.",
+        )
+    if upstream_license_status(root) != "mit_license_present":
+        raise AdapterError(
+            "upstream_license_unrecognized",
+            "The downloaded checkout does not contain the expected MIT license.",
+        )
+    return Dependency(root, skill_root, commit)
+
+
+def prepare_payload(
+    allow_network_install: bool,
+    cache_root: str | None = None,
+    timeout_seconds: int = 120,
+) -> tuple[dict[str, Any], int]:
+    """Install the immutable upstream checkout only after explicit approval."""
+    if not allow_network_install:
+        return error_payload(
+            "blocked",
+            "dependency_install_not_approved",
+            "Dependency setup requires explicit approval for a GitHub download and local cache write.",
+        ), 2
+
+    target = cached_dependency_path(cache_root)
+    if target.exists():
+        try:
+            dependency = validate_prepared_dependency(target)
+        except AdapterError as exc:
+            return error_payload(
+                "blocked",
+                "dependency_cache_conflict",
+                f"The cache target already exists but is unusable: {exc}",
+            ), 2
+        return prepared_dependency_payload(dependency, target, already_present=True), 0
+
+    cache_directory = target.parent
+    try:
+        cache_directory.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(
+            prefix=".vcep-download-", dir=cache_directory
+        ) as temporary_directory:
+            temporary_path = Path(temporary_directory)
+            run_git_command(["init", "--quiet", str(temporary_path)], timeout_seconds)
+            run_git_command(
+                [
+                    "-C",
+                    str(temporary_path),
+                    "remote",
+                    "add",
+                    "origin",
+                    f"{UPSTREAM_REPOSITORY}.git",
+                ],
+                timeout_seconds,
+            )
+            run_git_command(
+                [
+                    "-C",
+                    str(temporary_path),
+                    "fetch",
+                    "--quiet",
+                    "--depth",
+                    "1",
+                    "origin",
+                    EXPECTED_COMMIT,
+                ],
+                timeout_seconds,
+            )
+            run_git_command(
+                [
+                    "-C",
+                    str(temporary_path),
+                    "checkout",
+                    "--quiet",
+                    "--detach",
+                    EXPECTED_COMMIT,
+                ],
+                timeout_seconds,
+            )
+            dependency = validate_prepared_dependency(temporary_path)
+            os.replace(temporary_path, target)
+            dependency = Dependency(target, target / UPSTREAM_SKILL_RELATIVE, dependency.commit)
+    except AdapterError as exc:
+        return error_payload("capability_unavailable", exc.reason, str(exc)), 3
+    except OSError:
+        return error_payload(
+            "capability_unavailable",
+            "dependency_cache_write_failed",
+            "The verified dependency could not be installed in the local cache.",
+        ), 3
+
+    return prepared_dependency_payload(dependency, target, already_present=False), 0
+
+
+def prepared_dependency_payload(
+    dependency: Dependency, target: Path, already_present: bool
+) -> dict[str, Any]:
+    return {
+        "schema_version": "0.1.0",
+        "operation": "prepare_pinned_dependency",
+        "status": "ok",
+        "repository": UPSTREAM_REPOSITORY,
+        "commit": dependency.commit,
+        "cache_path": str(target),
+        "already_present": already_present,
+        "license_status": upstream_license_status(dependency.root),
+        "classification_engine_enabled": False,
+        "remote_disclosures": [
+            {
+                "service": "GitHub",
+                "repository": UPSTREAM_REPOSITORY,
+                "fields": ["repository", "commit"],
+                "clinical_data_disclosed": False,
+            }
+        ],
+        "provenance": provenance("git fetch and detached checkout"),
+    }
 
 
 def detect_genomic_variant(notation: str) -> dict[str, Any] | None:
@@ -1252,6 +1447,14 @@ def build_parser() -> argparse.ArgumentParser:
     status.add_argument("--upstream-root")
     status.add_argument("--output", "-o")
 
+    prepare = subparsers.add_parser(
+        "prepare", help="Download and verify the pinned dependency after approval."
+    )
+    prepare.add_argument("--allow-network-install", action="store_true")
+    prepare.add_argument("--cache-root")
+    prepare.add_argument("--timeout", type=int, default=120, choices=range(30, 301))
+    prepare.add_argument("--output", "-o")
+
     annotate = subparsers.add_parser(
         "annotate", help="Run pinned Ensembl VEP annotation."
     )
@@ -1282,6 +1485,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "status":
         payload, exit_code = status_payload(args.upstream_root)
+    elif args.command == "prepare":
+        payload, exit_code = prepare_payload(
+            args.allow_network_install,
+            args.cache_root,
+            args.timeout,
+        )
     elif args.command == "annotate":
         payload, exit_code = annotation_payload(
             args.variant,

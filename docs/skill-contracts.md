@@ -79,7 +79,7 @@ suspected infection or syndrome to an observed fact.
 ## `review-variant-table`
 
 **Goal:** Inspect an untrusted testing-company Excel, CSV, or TSV germline
-variant export and produce a reviewer-approved scientific mapping and variant
+variant export and produce an evidence-backed, reviewable scientific mapping and variant
 inventory without accepting the company's interpretation as verified.
 
 **Inputs**
@@ -96,24 +96,36 @@ inventory without accepting the company's interpretation as verified.
    cells, formulas, and candidate header rows without mutating the workbook.
 3. Propose the selected sheet, header, data range, row meaning, sample scope, and
    source-to-canonical column mapping.
-4. Require human review before extraction. Never fall back to the first sheet or
-   first row when parsing is ambiguous or malformed.
-5. Extract only approved scientific columns with source sheet/row lineage.
+4. Proceed directly with extraction and shortlisting when sample attribution,
+   mapping, and required build context are clear from the conversation and local
+   evidence. Request clarification only for remaining material uncertainty,
+   using source header names rather than column letters or numbers; redact
+   identifiers embedded in headers. Do not reconfirm resolved facts or fall
+   back to the first sheet or row when parsing is ambiguous or malformed.
+5. Extract only resolved scientific columns with source sheet/row lineage.
    Exclude direct identifiers and label company classifications, filters, ACMG
    codes, frequencies, and database assertions as supplied.
 6. Establish explicit genome build and coordinate convention before genomic
    normalization or classification. Preserve incomplete and ambiguous alleles.
 7. Reconcile accepted, unresolved, rejected, and blank rows against the examined
    range. Record a reason for every unresolved or rejected nonblank row.
-8. Route reviewer-selected records to disease ranking or individual sequence/CNV
+8. Run independent safety-recall lanes across every reviewed record for supplied
+   pathogenic assertions, database pathogenic assertions, severe consequences,
+   inheritance-relevant observations, and phenotype-linked records. Reconcile
+   their union, retaining missing frequency as unknown; phenotype or graph top-k
+   results may reorder but never gate variant inspection.
+9. Route reviewed candidate records to disease ranking or individual sequence/CNV
    classification without collapsing the table into a diagnostic conclusion.
 
 **Outputs**
 
 - `variant_table_review` artifact;
 - workbook inventory and reviewed selection;
+- basis for agent-resolved context and any user clarification, without treating
+  parser acceptance as human approval;
 - source-to-canonical mappings;
 - normalized scientific records with row lineage and dispositions;
+- safety-recall lanes, their union, and unknown-frequency count;
 - row reconciliation, blocking issues, missing context, and provenance;
 - downstream routing recommendations.
 
@@ -199,7 +211,9 @@ disease candidates, clearly identifying which mode was used.
    `https://rdkg.viknox.com.cn` and inspect both score and support selection arms.
 4. For variant-backed mode, use prioritization results and expose phenotype,
    genotype, inheritance, phase, and skipped-variant evidence.
-5. Reconcile the two lists without collapsing them into one opaque score.
+5. In `both` mode, reconcile the union of phenotype-first retrieval and the
+   complete reviewed variant safety recall. Graph rank and phenotype-derived
+   gene lists may reorder candidates but must not filter the variant lane.
 6. Explain coverage limitations and evidence conflicts.
 
 **Outputs**
@@ -213,7 +227,8 @@ disease candidates, clearly identifying which mode was used.
 insufficient, the assay/variant set is incomplete, or rankings are stale.
 
 **Must not** claim associated genes were tested, call a diagnosis solely from a
-rank, or interpret an unreturned disease as excluded.
+rank, interpret an unreturned disease as excluded, or use a graph top-k cutoff
+as an eligibility criterion for reviewed variants.
 
 ## `classify-sequence-variant`
 
@@ -241,7 +256,11 @@ proposal for one constitutional sequence variant and one disease context.
    one verified VCF-style allele before bundled annotation; stop if that
    normalization capability is unavailable.
 3. Verify the pinned `vcep-classification-skills` dependency and exact commit.
-   Dependency failure is not an empty annotation.
+   On a clean installation, an absent dependency may be downloaded from its
+   public GitHub repository into a local non-clinical cache only after explicit
+   user approval. Verify the exact commit, required resources, and MIT license
+   before use; disclose no clinical input during setup. Dependency or setup
+   failure is not an empty annotation.
 4. For genomic input, route GRCh38 and GRCh37 coordinates to their matching
    Ensembl REST endpoints without implicit liftover. Verify chromosome,
    position, REF, and ALT on the declared assembly with a reference-sequence

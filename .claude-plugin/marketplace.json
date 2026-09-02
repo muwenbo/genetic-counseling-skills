@@ -1,0 +1,20 @@
+{
+  "name": "genetic-counseling-skills",
+  "description": "Review-centered rare-disease constitutional and germline genetic counseling plugins.",
+  "owner": {
+    "name": "muwenbo"
+  },
+  "plugins": [
+    {
+      "name": "rare-disease-genetic-counseling",
+      "source": "./plugins/rare-disease-genetic-counseling",
+      "description": "Review-centered workflows for rare-disease constitutional and germline genetic counseling.",
+      "category": "healthcare",
+      "tags": [
+        "rare-disease",
+        "genetics",
+        "genetic-counseling"
+      ]
+    }
+  ]
+}

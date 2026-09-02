@@ -163,7 +163,12 @@ model or scientific API. A parser failure or unresolved mapping is not an empty
 variant result.
 
 Sequence annotation reuses pinned upstream `variant-classifier` code through
-`scripts/upstream_variant_adapter.py`. For HGVS, rsID, and normalized GRCh38
+`scripts/upstream_variant_adapter.py`. Developer checkouts resolve the pinned
+submodule. A clean public installation may, only after explicit user approval,
+fetch the exact public Git commit from GitHub into a local non-clinical cache.
+The adapter verifies the commit, required resources, and MIT license before
+making the checkout available, does not overwrite a conflicting cache target,
+and sends no clinical input during setup. For HGVS, rsID, and normalized GRCh38
 genomic input, upstream `vep_annotate.py` calls Ensembl REST operations under
 `https://rest.ensembl.org/vep/human/`. For normalized GRCh37 genomic input, the
 local bridge reuses the pinned VEP client and parser against

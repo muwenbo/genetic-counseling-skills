@@ -1,0 +1,8 @@
+{
+  "request": "install_without_command_line",
+  "surfaces": [
+    "codex_desktop_plugins_directory",
+    "claude_cowork_git_marketplace"
+  ],
+  "repository": "https://github.com/muwenbo/genetic-counseling-skills"
+}

@@ -24,6 +24,7 @@ scoring implementations, or clinical case storage.
 ```text
 rare-disease-genetic-counseling/
 ├── .codex-plugin/plugin.json
+├── .claude-plugin/plugin.json
 ├── skills/
 │   ├── prepare-rare-disease-case/
 │   ├── review-variant-table/
@@ -35,12 +36,25 @@ rare-disease-genetic-counseling/
 │   ├── interpret-negative-or-vus/
 │   ├── draft-counseling-summary/
 │   └── draw-pedigree/
-├── vendor/
-│   └── vcep-classification-skills/  # Git submodule
 ├── scripts/                     # shared REST client helpers, if needed
 ├── schemas/
 └── evals/
 ```
+
+The repository keeps the pinned development submodule at
+`vendor/vcep-classification-skills`; it is intentionally outside the plugin
+package. Clean installations use the approved, exact-commit cache bootstrap
+described below.
+
+## Distribution surfaces
+
+The same skill directories are packaged for both supported GUI agents. Codex
+uses `.codex-plugin/plugin.json` and the repository marketplace under
+`.agents/plugins/marketplace.json`. Claude Cowork uses
+`.claude-plugin/plugin.json` in the plugin plus the repository-level
+`.claude-plugin/marketplace.json`. Platform-specific manifests contain metadata
+only; the clinical workflows and guardrails remain single-source under
+`skills/`.
 
 Skills call the documented scientific REST APIs through small bundled clients.
 The public plugin does not depend on Noxia or another clinical record system.
@@ -54,14 +68,14 @@ The public knowledge-graph endpoint is `https://rdkg.viknox.com.cn`.
 | Capability | Source | Integration mode | Plugin responsibility |
 |---|---|---|---|
 | Finding extraction | skill reasoning, performed locally | in-skill workflow | Preserve spans and negation; translate minimized Chinese findings locally; proceed when the agent can verify semantic equivalence and request review only for material ambiguity |
-| Laboratory variant-table review | bundled local script plus skill reasoning | local file workflow | Inventory without mutation, exclude identifiers, require reviewed sheet/header/mapping, and preserve company annotations as supplied claims |
+| Laboratory variant-table review | bundled local script plus skill reasoning | local file workflow | Inventory without mutation, exclude identifiers, resolve sheet/header/mapping from evidence, clarify only material uncertainty using header names, and preserve company annotations as supplied claims |
 | HPO search and phenotype-only disease retrieval | `rd-knowledge-graph` at `https://rdkg.viknox.com.cn` | public HTTPS REST API | Send only agent-verified or reviewer-resolved English phrases to vector `/hpo/search`; call `/hpo/terms/{hp_id}` and graph `/candidates`; check graph coverage and never equate absence with exclusion |
 | Optional variant-backed gene ranking | user-supplied prioritization result | imported result | Keep external rank distinct from clinical conclusion; expose inheritance and phenotype evidence |
 | Local callset filtering | bundled local script plus skill reasoning | local file workflow | Filter an annotated callset with reviewer-approved criteria into an imported prioritization result; filter only on file-supplied annotations; never run as an automatic fallback from ranking |
 | Variant normalization | `hgvs-tools` | planned local HTTP service | Require explicit assembly for genomic input; independently verify REF before classification |
-| Sequence annotation and liftover | pinned `variant-classifier` VEP client/parser, Ensembl assembly map, plus NCBI Variation transcript mapping | local safety adapter calling assembly-specific Ensembl REST services | Reuse upstream code without modifying it; route declared GRCh38 and GRCh37 coordinates to matching VEP endpoints; convert simple alleles only with source/target REF verification and round-trip mapping; resolve unsupported versioned RefSeq HGVS through one canonical genomic allele; preserve every representation |
+| Sequence annotation and liftover | pinned `variant-classifier` VEP client/parser, Ensembl assembly map, plus NCBI Variation transcript mapping | local safety adapter calling assembly-specific Ensembl REST services | Reuse upstream code without modifying it; use the repository submodule in development or an explicitly approved, exact-commit, license-verified local cache in clean installations; route declared GRCh38 and GRCh37 coordinates to matching VEP endpoints; convert simple alleles only with source/target REF verification and round-trip mapping; resolve unsupported versioned RefSeq HGVS through one canonical genomic allele; preserve every representation |
 | Sequence evidence engine | `acmg-auto-classifier` | local HTTP service | Label output as automated and incomplete; build a reviewable proposal |
-| VCEP guidance | `vcep-classification-skills` | immutable Git submodule | Select disease/inheritance-specific specification and record exact commit/version |
+| VCEP guidance | `vcep-classification-skills` | immutable Git checkout: repository submodule or approved local cache | Select disease/inheritance-specific specification and record exact commit/version |
 | CNV classification | `cnvclassifier.viknox.com` | remote HTTPS API | Minimize payload, require build, preserve liftover and complete evidence trail |
 | Literature | PubMed/PMC via upstream paper finder plus discovery adapter | remote retrieval | Distinguish discovery from PMID fetch; preserve licensing and evidence extraction provenance |
 | Pedigree charting | bundled Pedigree Studio tool plus skill reasoning | local file and loopback-browser workflow | Generate a reviewable PED/JSON project, serve only the pinned application shell on `127.0.0.1`, export locally when browser capabilities permit, and degrade explicitly to data-only output; never infer relatives, phenotypes, or genotypes |
@@ -86,7 +100,7 @@ The public knowledge-graph endpoint is `https://rdkg.viknox.com.cn`.
 8. **Writes are isolated.** Analysis never implies authorization to update HPO
    terms, submit a classification, select a report variant, or edit a report.
 9. **Laboratory tables are untrusted source artifacts.** Never silently select a
-   sheet, drop a row, infer a build, or treat a company filter, classification,
+   ambiguous sheet, drop a row, invent a build, or treat a company filter, classification,
    ACMG code, frequency, or candidate rank as independently verified evidence.
 10. **Chinese graph retrieval uses semantically checked English phrases.**
     Extract and translate minimized findings locally, preserve assertion and
@@ -122,9 +136,13 @@ preservation, and the distinction between failure and an empty lookup.
 The upstream automatic classifier is not executed because its consequence-only
 PVS1, absent-frequency PM2, and binary evidence behavior conflict with this
 plugin's clinical guardrails. The pinned commit includes a standalone MIT
-`LICENSE`. Root-level submodules are not copied into the Codex plugin cache, so
-public packaging of the dependency remains a release gate until the dependency
-is distributed through a reviewed, license-compliant mechanism.
+`LICENSE`. Root-level submodules are not copied into the Codex plugin cache.
+For clean public installations, the adapter therefore offers an explicit-
+approval setup operation that fetches only the pinned public Git commit into a
+non-clinical local cache, verifies the commit, required layout, and MIT license,
+and atomically installs the checkout. No clinical input is sent during setup.
+A declined or failed setup remains a capability failure rather than a negative
+annotation result.
 
 An update automation may:
 

@@ -12,8 +12,9 @@ coverage.xml
 .coverage
 htmlcov/
 
-# Local pedigree rendering outputs; family-history artifacts must not be committed.
+# Local generated outputs; clinical and family-history artifacts must not be committed.
 /artifacts/
+/outputs/
 /pedigree-*.json
 /pedigree-*.svg
 /pedigree_*.json

@@ -206,6 +206,13 @@ may reuse the upstream scripts only through the plugin-owned safety adapter.
 Do not invoke upstream `classify_variant.py` as a clinical classifier; its PVS1,
 PM2, and evidence-state behavior does not meet this repository's guardrails.
 
+Because a root-level submodule is not included in a clean plugin installation,
+the safety adapter may offer a first-use setup operation. It must require
+explicit user approval, fetch only the exact pinned public Git commit into a
+non-clinical local cache, verify the commit, required files, and MIT license,
+avoid overwriting an existing conflicting target, and disclose no clinical data
+during setup. A declined or failed setup is a capability failure.
+
 For upstream updates:
 
 1. Fetch upstream and identify the old and proposed commits.

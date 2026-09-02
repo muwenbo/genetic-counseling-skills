@@ -1,6 +1,6 @@
 {
   "name": "rare-disease-genetic-counseling",
-  "version": "0.1.0+codex.20260821090419",
+  "version": "0.1.0+codex.20260902094937",
   "description": "Review-centered workflows for rare-disease germline case preparation, variant-table and callset review, pedigree drawing, candidate ranking, variant and CNV interpretation, literature review, and counseling drafts.",
   "author": {
     "name": "muwenbo"

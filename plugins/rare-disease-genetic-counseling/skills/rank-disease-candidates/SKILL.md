@@ -38,7 +38,8 @@ Use the public knowledge-graph base URL `https://rdkg.viknox.com.cn`.
    `filter-variant-callset`. Review inheritance, phase, compound heterozygosity,
    phenotype match type, skipped variants, and assay coverage—not only rank.
 7. In `both` mode, show agreement, disagreement, and evidence unique to each
-   mode. Do not average unlike scores.
+   mode. Reconcile the union of phenotype-derived candidates and every candidate
+   retained by the reviewed variant safety recall. Do not average unlike scores.
 8. Explain graph and assay coverage limitations before interpreting a negative
    result.
 
@@ -61,4 +62,6 @@ support-arm candidates, or absent results.
 - Report unavailable infrastructure separately from an empty candidate list.
 
 Never claim that an associated gene was tested, assign an unnamed variant to a
-gene, or treat an unreturned disease as excluded.
+gene, or treat an unreturned disease as excluded. Never use graph rank, a top-k
+cutoff, or a phenotype-derived gene allowlist to filter the reviewed variant
+set; these signals may reorder candidates only.

@@ -22,6 +22,26 @@
 The knowledge graph has incomplete disease-phenotype coverage. “No good candidate
 was retrieved” and “the disease was excluded” are never equivalent.
 
+## Two-lane recall and reconciliation
+
+When reviewed variants are available, maintain two independent lanes:
+
+1. phenotype-first retrieval from reviewed HPO terms;
+2. variant-first recall from the complete reviewed table or imported
+   prioritization result.
+
+Take the union before ranking. Graph rank and phenotype-derived gene lists may
+change priority but must not determine eligibility for variant review. Inspect
+all records retained by supplied pathogenic assertions, database pathogenic
+assertions, severe consequences, inheritance-relevant zygosity, repeated-gene
+observations, or other reviewer-approved recall lanes even when their gene or
+disease is absent from graph top-k results.
+
+Missing frequency remains unknown. Preserve severe-consequence candidates with
+unknown frequency and state that population rarity has not been established.
+Likewise, a blank supplied classification is missing evidence, not a reason to
+skip another recall lane.
+
 ## Variant-backed prioritization
 
 Inspect:
@@ -42,9 +62,11 @@ Do not let a rank suppress an obvious high-impact, phenotype-relevant candidate.
 
 Show three groups:
 
-1. supported by both phenotype and variant evidence;
+1. supported by both phenotype and variant evidence, including variant-first
+   candidates whose phenotype support is established during reconciliation;
 2. phenotype-supported but lacking a suitable detected variant;
-3. variant-supported but weak or contradictory in phenotype.
+3. variant-supported but absent from graph retrieval, weak in phenotype, or
+   contradictory in phenotype.
 
 Do not average graph similarity and genotype likelihood scores. Explain the
 evidence dimensions separately.

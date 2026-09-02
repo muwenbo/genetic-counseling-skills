@@ -38,6 +38,12 @@
       "expected": "fixtures/SEQ-006-bidirectional-liftover.expected.json"
     },
     {
+      "id": "SEQ-007-approved-pinned-dependency-setup",
+      "skill": "classify-sequence-variant",
+      "input": "fixtures/SEQ-007-approved-pinned-dependency-setup.input.json",
+      "expected": "fixtures/SEQ-007-approved-pinned-dependency-setup.expected.json"
+    },
+    {
       "id": "CNV-001-missing-build",
       "skill": "classify-cnv",
       "input": "fixtures/CNV-001-missing-build.input.json",
@@ -54,6 +60,18 @@
       "skill": "review-variant-table",
       "input": "fixtures/TABLE-001-ambiguous-layout.input.json",
       "expected": "fixtures/TABLE-001-ambiguous-layout.expected.json"
+    },
+    {
+      "id": "TABLE-002-safety-recall-union",
+      "skill": "review-variant-table",
+      "input": "fixtures/TABLE-002-safety-recall-union.input.json",
+      "expected": "fixtures/TABLE-002-safety-recall-union.expected.json"
+    },
+    {
+      "id": "TABLE-003-context-clarification",
+      "skill": "review-variant-table",
+      "input": "fixtures/TABLE-003-context-clarification.input.json",
+      "expected": "fixtures/TABLE-003-context-clarification.expected.json"
     },
     {
       "id": "CALLSET-001-missing-build",
@@ -90,6 +108,12 @@
       "skill": "draw-pedigree",
       "input": "fixtures/PED-003-nuclear-family-import-verification.input.json",
       "expected": "fixtures/PED-003-nuclear-family-import-verification.expected.json"
+    },
+    {
+      "id": "PACKAGE-001-gui-installation",
+      "skill": "plugin-packaging",
+      "input": "fixtures/PACKAGE-001-gui-installation.input.json",
+      "expected": "fixtures/PACKAGE-001-gui-installation.expected.json"
     }
   ]
 }

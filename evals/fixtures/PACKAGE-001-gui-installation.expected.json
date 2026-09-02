@@ -1,0 +1,17 @@
+{
+  "plugin_name": "rare-disease-genetic-counseling",
+  "required_manifests": [
+    ".agents/plugins/marketplace.json",
+    ".claude-plugin/marketplace.json",
+    "plugins/rare-disease-genetic-counseling/.codex-plugin/plugin.json",
+    "plugins/rare-disease-genetic-counseling/.claude-plugin/plugin.json"
+  ],
+  "shared_skill_directory": "plugins/rare-disease-genetic-counseling/skills",
+  "codex_new_chat_required": true,
+  "claude_marketplace_source": "./plugins/rare-disease-genetic-counseling",
+  "must_not": [
+    "require a command line for the documented GUI path",
+    "claim Claude compatibility without a Claude marketplace manifest",
+    "duplicate clinical skill instructions between platforms"
+  ]
+}

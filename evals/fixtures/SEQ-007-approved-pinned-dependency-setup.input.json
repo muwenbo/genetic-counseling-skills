@@ -1,0 +1,7 @@
+{
+  "request": "classify_sequence_variant",
+  "dependency_status": "upstream_dependency_unavailable",
+  "user_approved_network_install": false,
+  "repository": "https://github.com/muwenbo/vcep-classification-skills",
+  "required_commit": "05bf1f6bce4e6be04f9e52b55db1d5fee03029d9"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "rare-disease-genetic-counseling",
+  "version": "0.1.0",
+  "description": "Review-centered workflows for rare-disease constitutional and germline genetic counseling.",
+  "author": {
+    "name": "muwenbo"
+  },
+  "homepage": "https://github.com/muwenbo/genetic-counseling-skills",
+  "repository": "https://github.com/muwenbo/genetic-counseling-skills",
+  "license": "MIT",
+  "keywords": [
+    "rare-disease",
+    "genetics",
+    "genetic-counseling"
+  ]
+}

@@ -2,13 +2,13 @@
   "outcome": "blocked",
   "blocking_reasons": [
     "variant_sheet_ambiguous",
-    "column_mapping_unreviewed",
+    "column_mapping_ambiguous",
     "genome_build_missing",
     "sample_scope_missing"
   ],
   "must_request": [
     "reviewer selection of sheet and header row",
-    "reviewed source-to-canonical column mapping",
+    "clarification of ambiguous source headers by header name, not column position",
     "genome build and coordinate convention",
     "assay and sample scope"
   ],

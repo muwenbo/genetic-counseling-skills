@@ -59,6 +59,82 @@ class UpstreamVariantAdapterTests(unittest.TestCase):
         self.assertEqual(exit_code, 3)
         self.assertEqual(payload["reason"], "upstream_dependency_unavailable")
 
+    def test_status_offers_approved_setup_when_dependency_is_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            payload, exit_code = ADAPTER.status_payload(temporary_directory)
+        self.assertEqual(exit_code, 3)
+        self.assertTrue(payload["approved_setup_available"])
+        self.assertEqual(
+            payload["setup_operation"], "prepare --allow-network-install"
+        )
+
+    def test_prepare_requires_explicit_network_install_approval(self) -> None:
+        with (
+            tempfile.TemporaryDirectory() as temporary_directory,
+            mock.patch.object(ADAPTER, "run_git_command") as runner,
+        ):
+            payload, exit_code = ADAPTER.prepare_payload(
+                False, temporary_directory
+            )
+        self.assertEqual(exit_code, 2)
+        self.assertEqual(payload["reason"], "dependency_install_not_approved")
+        runner.assert_not_called()
+
+    def test_prepare_installs_only_verified_commit_in_selected_cache(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            cache_root = Path(temporary_directory) / "cache"
+
+            def create_checkout(arguments, _timeout_seconds):
+                if arguments[:2] == ["init", "--quiet"]:
+                    checkout = Path(arguments[2])
+                    skill_root = checkout / ADAPTER.UPSTREAM_SKILL_RELATIVE
+                    (skill_root / "scripts").mkdir(parents=True)
+                    (skill_root / "data").mkdir()
+                    (skill_root / "scripts/vep_annotate.py").write_text("")
+                    (skill_root / "scripts/check_vcep_spec.py").write_text("")
+                    (skill_root / "data/vcep_registry.json").write_text("{}")
+                    (checkout / "LICENSE").write_text("MIT License\n")
+
+            with (
+                mock.patch.object(
+                    ADAPTER, "run_git_command", side_effect=create_checkout
+                ) as runner,
+                mock.patch.object(
+                    ADAPTER, "git_commit", return_value=ADAPTER.EXPECTED_COMMIT
+                ),
+            ):
+                payload, exit_code = ADAPTER.prepare_payload(
+                    True, str(cache_root), timeout_seconds=30
+                )
+
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(payload["status"], "ok")
+            self.assertEqual(payload["commit"], ADAPTER.EXPECTED_COMMIT)
+            self.assertFalse(payload["already_present"])
+            self.assertFalse(
+                payload["remote_disclosures"][0]["clinical_data_disclosed"]
+            )
+            self.assertEqual(runner.call_count, 4)
+            installed = cache_root / ADAPTER.PINNED_CHECKOUT_DIRECTORY
+            self.assertTrue(installed.is_dir())
+
+    def test_prepare_does_not_overwrite_an_invalid_cache_target(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            target = (
+                Path(temporary_directory) / ADAPTER.PINNED_CHECKOUT_DIRECTORY
+            )
+            target.mkdir()
+            marker = target / "keep.txt"
+            marker.write_text("user data")
+            with mock.patch.object(ADAPTER, "run_git_command") as runner:
+                payload, exit_code = ADAPTER.prepare_payload(
+                    True, temporary_directory
+                )
+            self.assertEqual(exit_code, 2)
+            self.assertEqual(payload["reason"], "dependency_cache_conflict")
+            self.assertEqual(marker.read_text(), "user data")
+            runner.assert_not_called()
+
     def test_missing_dependency_stops_before_reference_service(self) -> None:
         with (
             tempfile.TemporaryDirectory() as temporary_directory,

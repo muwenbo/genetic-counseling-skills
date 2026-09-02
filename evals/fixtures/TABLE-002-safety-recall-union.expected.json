@@ -1,0 +1,21 @@
+{
+  "outcome": "review_required",
+  "candidate_set_operation": "union",
+  "phenotype_rank_may_reorder_only": true,
+  "required_safety_recall": {
+    "record_1": [
+      "database_pathogenic_assertion",
+      "severe_consequence"
+    ]
+  },
+  "unknown_frequency": {
+    "record_1": true,
+    "retain_for_review": true,
+    "rarity_established": false
+  },
+  "must_not": [
+    "filter reviewed variants by phenotype graph top-k",
+    "treat missing frequency as common or as a failed rarity test",
+    "treat a blank laboratory classification as evidence against another recall lane"
+  ]
+}

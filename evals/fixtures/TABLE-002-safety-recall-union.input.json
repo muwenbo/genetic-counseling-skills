@@ -1,0 +1,28 @@
+{
+  "request": "review_variant_table_and_rank_candidates",
+  "genome_build": "hg38",
+  "reviewed_records": [
+    {
+      "record_id": "record_1",
+      "gene": "GENE_A",
+      "consequence": "stop_gained",
+      "population_frequency_supplied": null,
+      "classification_supplied": null,
+      "database_classification_supplied": "pathogenic",
+      "zygosity": "heterozygous"
+    },
+    {
+      "record_id": "record_2",
+      "gene": "GENE_B",
+      "consequence": "missense_variant",
+      "population_frequency_supplied": 0.2,
+      "classification_supplied": null,
+      "database_classification_supplied": null,
+      "zygosity": "heterozygous"
+    }
+  ],
+  "phenotype_graph": {
+    "limit": 50,
+    "returned_gene_symbols": ["GENE_B"]
+  }
+}

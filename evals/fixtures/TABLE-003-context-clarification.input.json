@@ -1,0 +1,25 @@
+{
+  "request": "Analyze the supplied patient variant table and shortlist relevant candidates.",
+  "scenarios": [
+    {
+      "id": "clear_context",
+      "user_context": {"sample_scope": "proband_only", "genome_build": "hg19", "coordinate_convention": "1-based"},
+      "sheets": [{"ref": "sheet_1", "header_row": 1, "data_start_row": 2, "headers": ["Gene", "HGVS", "Index_Zygosity", "MaxAF"]}],
+      "export_legend": {"HGVS": "Versioned transcript and coding HGVS", "Index_Zygosity": "Proband zygosity", "MaxAF": "Maximum population allele frequency"}
+    },
+    {
+      "id": "ambiguous_frequency",
+      "user_context": {"sample_scope": "proband_only", "genome_build": "hg19", "coordinate_convention": "1-based"},
+      "sheets": [{"ref": "sheet_1", "header_row": 1, "data_start_row": 2, "headers": ["Gene", "HGVS", "Index_Zygosity", "AF"]}],
+      "export_legend": {"HGVS": "Versioned transcript and coding HGVS", "Index_Zygosity": "Proband zygosity"},
+      "requested_filter": "population allele frequency below 0.01"
+    },
+    {
+      "id": "link_only_build",
+      "user_context": {"sample_scope": "proband_only"},
+      "sheets": [{"ref": "sheet_1", "header_row": 1, "data_start_row": 2, "headers": ["Gene", "Chromosome", "Position", "Ref", "Alt", "Validator_Link"]}],
+      "link_build_parameter": "GRCh37",
+      "requested_operation": "genomic normalization"
+    }
+  ]
+}

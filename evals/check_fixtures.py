@@ -125,6 +125,30 @@ def main() -> None:
         in lift_expected["must_not"]
     )
 
+    setup_input, setup_expected = loaded[
+        "SEQ-007-approved-pinned-dependency-setup"
+    ]
+    assert setup_input["dependency_status"] == "upstream_dependency_unavailable"
+    assert setup_input["user_approved_network_install"] is False
+    assert setup_expected["outcome_before_approval"] == "blocked"
+    assert setup_expected["approved_setup_operation"] == (
+        "prepare --allow-network-install"
+    )
+    assert setup_expected["required_verification"] == [
+        "exact_git_commit",
+        "required_resource_layout",
+        "mit_license",
+    ]
+    assert setup_expected["setup_disclosed_fields"] == ["repository", "commit"]
+    assert setup_expected["clinical_data_disclosed"] is False
+    assert setup_expected["existing_invalid_target_behavior"] == "do_not_overwrite"
+    assert setup_expected["failure_semantics"] == "capability_unavailable"
+    assert "download before explicit approval" in setup_expected["must_not"]
+    assert "fetch a moving branch" in setup_expected["must_not"]
+    assert (
+        "send a variant or case fact during setup" in setup_expected["must_not"]
+    )
+
     cnv_input, cnv_expected = loaded["CNV-001-missing-build"]
     parsed = cnv_expected["parsed"]
     assert cnv_input["genome_build"] is None
@@ -155,6 +179,21 @@ def main() -> None:
     assert "variant_sheet_ambiguous" in table_expected["blocking_reasons"]
     assert "default to the first sheet" in table_expected["must_not"]
     assert "both candidate sheets" in table_expected["must_preserve"]
+
+    recall_input, recall_expected = loaded["TABLE-002-safety-recall-union"]
+    assert recall_input["phenotype_graph"]["returned_gene_symbols"] == ["GENE_B"]
+    assert recall_expected["candidate_set_operation"] == "union"
+    assert recall_expected["phenotype_rank_may_reorder_only"] is True
+    assert recall_expected["required_safety_recall"]["record_1"] == [
+        "database_pathogenic_assertion",
+        "severe_consequence",
+    ]
+    assert recall_expected["unknown_frequency"]["retain_for_review"] is True
+    assert recall_expected["unknown_frequency"]["rarity_established"] is False
+    assert (
+        "filter reviewed variants by phenotype graph top-k"
+        in recall_expected["must_not"]
+    )
 
     callset_input, callset_expected = loaded["CALLSET-001-missing-build"]
     assert callset_input["genome_build"] is None
@@ -255,6 +294,36 @@ def main() -> None:
     assert "omit genotypes from a generated individual" in family_expected["must_not"]
     assert (
         "describe a screenshot as an exported SVG or PNG" in family_expected["must_not"]
+    )
+
+    package_input, package_expected = loaded["PACKAGE-001-gui-installation"]
+    assert package_input["surfaces"] == [
+        "codex_desktop_plugins_directory",
+        "claude_cowork_git_marketplace",
+    ]
+    repository_root = ROOT.parent
+    for relative_path in package_expected["required_manifests"]:
+        assert (repository_root / relative_path).is_file(), (
+            f"missing GUI packaging manifest: {relative_path}"
+        )
+    codex_manifest = load(
+        repository_root
+        / "plugins/rare-disease-genetic-counseling/.codex-plugin/plugin.json"
+    )
+    claude_manifest = load(
+        repository_root
+        / "plugins/rare-disease-genetic-counseling/.claude-plugin/plugin.json"
+    )
+    claude_marketplace = load(repository_root / ".claude-plugin/marketplace.json")
+    assert codex_manifest["name"] == package_expected["plugin_name"]
+    assert claude_manifest["name"] == package_expected["plugin_name"]
+    assert claude_marketplace["plugins"][0]["source"] == (
+        package_expected["claude_marketplace_source"]
+    )
+    assert package_expected["codex_new_chat_required"] is True
+    assert (
+        "claim Claude compatibility without a Claude marketplace manifest"
+        in package_expected["must_not"]
     )
 
     print(f"Validated {len(fixtures)} independent fixtures.")

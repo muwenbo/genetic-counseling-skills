@@ -16,10 +16,38 @@ Run the dependency check before using either operation:
 python3 "$SKILL_DIR/scripts/upstream_variant_adapter.py" status
 ```
 
-If automatic discovery fails, pass the checked-out repository explicitly with
-`--upstream-root` or set `RARE_DISEASE_VCEP_ROOT`. Do not fetch a moving branch
-or accept a different commit. Dependency absence or mismatch is a capability
-failure, not an empty annotation or a negative clinical result.
+If automatic discovery fails on a developer checkout, pass the checked-out
+repository explicitly with `--upstream-root` or set
+`RARE_DISEASE_VCEP_ROOT`. Do not fetch a moving branch or accept a different
+commit. Dependency absence or mismatch is a capability failure, not an empty
+annotation or a negative clinical result.
+
+## Approved setup for clean public installations
+
+The plugin does not redistribute the upstream repository. On first use, `status`
+may report `approved_setup_available`. Explain the following before setup:
+
+- the adapter will contact GitHub for the public repository and exact pinned
+  commit only;
+- it will create a detached checkout under a local cache (or the configured
+  `RARE_DISEASE_VCEP_CACHE_ROOT`);
+- no variant, phenotype, narrative, identifier, or other clinical data is sent;
+- the checkout must contain the expected Git commit, required resources, and
+  standalone MIT license before it becomes usable.
+
+After explicit approval, run:
+
+```bash
+python3 "$SKILL_DIR/scripts/upstream_variant_adapter.py" prepare \
+  --allow-network-install
+python3 "$SKILL_DIR/scripts/upstream_variant_adapter.py" status
+```
+
+Setup uses a temporary directory and atomically installs only a fully verified
+checkout. It does not overwrite an existing invalid cache target. A timeout,
+Git failure, commit mismatch, missing file, or unrecognized license leaves the
+capability unavailable. Do not delete or repair a conflicting cache directory
+without separate user authorization.
 
 ## Annotation
 

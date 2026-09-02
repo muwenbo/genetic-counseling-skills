@@ -43,9 +43,15 @@ pathogenicity evidence.
 ## Workflow
 
 1. Run `python3 "$SKILL_DIR/scripts/upstream_variant_adapter.py" status`.
-   Require the pinned
-   upstream commit; treat absence, mismatch, or malformed output as a capability
-   failure rather than an empty annotation.
+   Require the pinned upstream commit; treat absence, mismatch, or malformed
+   output as a capability failure rather than an empty annotation. On a clean
+   installation, if status reports `approved_setup_available`, explain that setup
+   downloads the public MIT-licensed repository at the recorded commit from
+   GitHub into a local non-clinical cache. Obtain explicit approval before running
+   `python3 "$SKILL_DIR/scripts/upstream_variant_adapter.py" prepare
+   --allow-network-install`, then rerun `status`. The setup request discloses only
+   repository and commit metadata—never a variant, case fact, or identifier. If
+   approval is declined or setup fails, stop with capability unavailable.
 2. Parse the asserted representation without silently repairing it. Genomic
    RefSeq HGVS (`NC_...:g.`) is genomic input and requires a build.
 3. If the input is genomic and the build is missing, stop before any tool call.

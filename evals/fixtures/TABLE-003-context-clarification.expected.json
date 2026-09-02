@@ -1,0 +1,24 @@
+{
+  "scenarios": [
+    {
+      "id": "clear_context",
+      "outcome": "proceed_without_confirmation",
+      "required_actions": ["extract scientific fields", "perform evidence-preserving safety recall before prioritization", "record context and mapping evidence"],
+      "must_not": ["request a pre-extraction approval checklist", "reconfirm sample attribution or genome build", "claim agent-resolved mapping was human-approved"]
+    },
+    {
+      "id": "ambiguous_frequency",
+      "outcome": "clarify_affected_filter_only",
+      "question_header": "AF",
+      "question_meaning": "population allele frequency versus within-sample allele fraction",
+      "may_continue": ["local inventory", "extract unambiguous scientific fields"],
+      "must_not": ["apply the population-frequency filter before resolving AF", "refer to column D or column 4", "reconfirm the resolved sample or build"]
+    },
+    {
+      "id": "link_only_build",
+      "outcome": "clarify_build_before_normalization",
+      "may_continue": ["local inventory"],
+      "must_not": ["treat Validator_Link parameters as an explicit build declaration", "normalize before resolving the build", "reconfirm sample attribution"]
+    }
+  ]
+}

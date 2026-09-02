@@ -1,0 +1,23 @@
+{
+  "outcome_before_approval": "blocked",
+  "approved_setup_operation": "prepare --allow-network-install",
+  "install_location": "non_clinical_local_cache",
+  "required_verification": [
+    "exact_git_commit",
+    "required_resource_layout",
+    "mit_license"
+  ],
+  "setup_disclosed_fields": [
+    "repository",
+    "commit"
+  ],
+  "clinical_data_disclosed": false,
+  "existing_invalid_target_behavior": "do_not_overwrite",
+  "failure_semantics": "capability_unavailable",
+  "must_not": [
+    "download before explicit approval",
+    "fetch a moving branch",
+    "send a variant or case fact during setup",
+    "treat setup failure as an empty annotation"
+  ]
+}
