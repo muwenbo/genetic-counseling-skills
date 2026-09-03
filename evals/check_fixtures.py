@@ -297,10 +297,7 @@ def main() -> None:
     )
 
     package_input, package_expected = loaded["PACKAGE-001-gui-installation"]
-    assert package_input["surfaces"] == [
-        "codex_desktop_plugins_directory",
-        "claude_cowork_git_marketplace",
-    ]
+    assert package_input["surfaces"] == ["general_gui_agent"]
     repository_root = ROOT.parent
     for relative_path in package_expected["required_manifests"]:
         assert (repository_root / relative_path).is_file(), (
@@ -320,7 +317,20 @@ def main() -> None:
     assert claude_marketplace["plugins"][0]["source"] == (
         package_expected["claude_marketplace_source"]
     )
-    assert package_expected["codex_new_chat_required"] is True
+    documentation = package_expected["documentation"]
+    assert documentation["installation_style"] == "agent-directed"
+    english_readme = repository_root / documentation["english"]
+    chinese_readme = repository_root / documentation["simplified_chinese"]
+    assert english_readme.is_file()
+    assert chinese_readme.is_file()
+    english_text = english_readme.read_text(encoding="utf-8")
+    chinese_text = chinese_readme.read_text(encoding="utf-8")
+    assert "README.zh-CN.md" in english_text
+    assert "README.md" in chinese_text
+    assert "https://github.com/muwenbo/genetic-counseling-skills" in english_text
+    assert "https://github.com/muwenbo/genetic-counseling-skills" in chinese_text
+    assert "Customize → Plugins" not in english_text
+    assert "Customize → Plugins" not in chinese_text
     assert (
         "claim Claude compatibility without a Claude marketplace manifest"
         in package_expected["must_not"]

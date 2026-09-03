@@ -7,10 +7,15 @@
     "plugins/rare-disease-genetic-counseling/.claude-plugin/plugin.json"
   ],
   "shared_skill_directory": "plugins/rare-disease-genetic-counseling/skills",
-  "codex_new_chat_required": true,
+  "documentation": {
+    "english": "README.md",
+    "simplified_chinese": "README.zh-CN.md",
+    "installation_style": "agent-directed"
+  },
   "claude_marketplace_source": "./plugins/rare-disease-genetic-counseling",
   "must_not": [
     "require a command line for the documented GUI path",
+    "document product-specific menu navigation for end users",
     "claim Claude compatibility without a Claude marketplace manifest",
     "duplicate clinical skill instructions between platforms"
   ]

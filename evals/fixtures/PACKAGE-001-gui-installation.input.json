@@ -1,8 +1,7 @@
 {
-  "request": "install_without_command_line",
+  "request": "install_by_asking_the_agent",
   "surfaces": [
-    "codex_desktop_plugins_directory",
-    "claude_cowork_git_marketplace"
+    "general_gui_agent"
   ],
   "repository": "https://github.com/muwenbo/genetic-counseling-skills"
 }

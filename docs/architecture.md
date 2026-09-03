@@ -6,8 +6,8 @@ The first release supports rare-disease constitutional/germline counseling. It
 does not cover somatic oncology, pharmacogenomics, reproductive carrier
 screening, polygenic risk, or newborn screening as standalone workflows.
 
-The plugin is an orchestration and safety layer. Existing services remain the
-source of computed annotations, rankings, and evidence. The plugin owns:
+The skill collection is an orchestration and safety layer. Existing services
+remain the source of computed annotations, rankings, and evidence. It owns:
 
 - input validation and normalization gates;
 - separation of observed, explicitly absent, suspected, and historical facts;
@@ -48,16 +48,22 @@ described below.
 
 ## Distribution surfaces
 
-The same skill directories are packaged for both supported GUI agents. Codex
-uses `.codex-plugin/plugin.json` and the repository marketplace under
-`.agents/plugins/marketplace.json`. Claude Cowork uses
-`.claude-plugin/plugin.json` in the plugin plus the repository-level
-`.claude-plugin/marketplace.json`. Platform-specific manifests contain metadata
-only; the clinical workflows and guardrails remain single-source under
-`skills/`.
+The clinical workflows are agent-neutral and remain single-source under
+`skills/`. A GUI-based agent that supports repository-distributed skills or
+plugins should be able to select its own installation method and configure the
+collection for the user. Public onboarding therefore gives users one
+conversational installation request instead of product-specific menu paths.
+
+Platform manifests are compatibility metadata, not separate implementations.
+The repository currently includes Codex metadata in
+`.codex-plugin/plugin.json` and `.agents/plugins/marketplace.json`, plus Claude
+metadata in `.claude-plugin/plugin.json` and the repository-level
+`.claude-plugin/marketplace.json`. Other compatible agents can consume the same
+skill directories without duplicating the clinical workflows or guardrails.
 
 Skills call the documented scientific REST APIs through small bundled clients.
-The public plugin does not depend on Noxia or another clinical record system.
+The public skill collection does not depend on Noxia or another clinical record
+system.
 Service-specific request and response contracts remain explicit so API failures
 cannot be mistaken for negative clinical results.
 

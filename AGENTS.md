@@ -1,9 +1,11 @@
 # Rare-Disease Genetic Counseling Plugin — Agent Guide
 
-This repository develops a public, installable Codex plugin for rare-disease
-constitutional/germline genetic counseling. Treat it as clinical decision
-support: outputs are reviewable proposals, never autonomous diagnoses,
-classifications, signed reports, or treatment instructions.
+This repository develops a public, installable collection of AI-agent skills
+for rare-disease constitutional/germline genetic counseling. The same skills
+are packaged for compatible GUI-based agents through platform metadata. Treat
+them as clinical decision support: outputs are reviewable proposals, never
+autonomous diagnoses, classifications, signed reports, or treatment
+instructions.
 
 ## Start here
 
@@ -50,7 +52,10 @@ accepted as input, but the plugin must remain system-independent.
 
 ```text
 .
+├── README.md                              # English public documentation
+├── README.zh-CN.md                        # Simplified Chinese documentation
 ├── .agents/plugins/marketplace.json       # repo-local developer marketplace
+├── .claude-plugin/marketplace.json        # Claude-compatible marketplace
 ├── docs/
 │   ├── architecture.md                    # boundaries and integration policy
 │   ├── skill-contracts.md                 # user-facing workflow contracts
@@ -58,6 +63,7 @@ accepted as input, but the plugin must remain system-independent.
 ├── evals/                                 # independent acceptance fixtures
 └── plugins/rare-disease-genetic-counseling/
     ├── .codex-plugin/plugin.json
+    ├── .claude-plugin/plugin.json
     ├── schemas/
     └── skills/
 ```

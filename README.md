@@ -1,29 +1,36 @@
-# Rare-Disease Genetic Counseling Plugin
+# Rare-Disease Genetic Counseling Skills
 
-An installable AI-agent plugin for review-centered rare-disease constitutional
-and germline genetic counseling workflows. It helps structure English or Chinese
-case narratives, review variant tables and annotated callsets, rank disease
-candidates, interpret sequence variants and CNVs, find literature, assess
-negative or uncertain results, draw pedigrees, and draft counseling summaries.
+English | [简体中文](README.zh-CN.md)
+
+An installable collection of AI-agent skills for review-centered rare-disease
+constitutional and germline genetic counseling workflows. It is designed for
+GUI-based agent software that supports skills or plugins, such as Codex, Claude
+Cowork, and WorkBuddy. It helps structure English or Chinese case narratives,
+review variant tables and annotated callsets, rank disease candidates, interpret
+sequence variants and CNVs, find literature, assess negative or uncertain
+results, draw pedigrees, and draft counseling summaries.
 
 > [!IMPORTANT]
-> This plugin provides clinical decision support, not autonomous diagnosis.
+> These skills provide clinical decision support, not autonomous diagnosis.
 > Classifications, candidate rankings, reports, and recommendations are
 > reviewable proposals that require a qualified genetics professional. Do not
-> use it for emergencies, somatic oncology, pharmacogenomics, or independent
+> use them for emergencies, somatic oncology, pharmacogenomics, or independent
 > treatment decisions.
 
-## Install without a command line
+## Ask your AI agent to install it
 
-No programming is required. Once the public release is available, in Codex open
-the **Plugins** directory in the ChatGPT desktop app, search for **Rare Disease
-Genetic Counseling**, select the **+** button, and start a new chat after
-installation. In Claude Cowork, open
-**Customize → Plugins → + → Add marketplace**, paste
-`https://github.com/muwenbo/genetic-counseling-skills`, then select this plugin
-and choose **Install**. These steps follow the current
-[OpenAI plugin instructions](https://learn.chatgpt.com/docs/plugins) and
-[Claude Cowork plugin instructions](https://claude.com/docs/cowork/guide/plugins).
+No programming or command line is required. In a GUI-based AI agent that
+supports skills or plugins, send the following message:
+
+> Install and configure the **Rare Disease Genetic Counseling** skills from
+> <https://github.com/muwenbo/genetic-counseling-skills> for this agent. Use the
+> installation method supported by this application. Tell me when the skills
+> are ready, what permissions or network access they need, and whether I need
+> to restart the application or begin a new conversation.
+
+The agent should handle the application-specific setup and ask for approval
+before downloading additional dependencies or making security-sensitive
+changes.
 
 ## Included workflows
 
@@ -43,7 +50,7 @@ and choose **Install**. These steps follow the current
 - Create validated pedigree data and reviewable pedigree figures from supplied
   family facts.
 
-The plugin has no connection to a clinical record system and does not write
+The skills have no connection to a clinical record system and do not write
 results to one. Clinical narratives and local files remain local by default.
 When a scientific service is needed, the workflow minimizes the disclosed
 payload and records the service, operation, version, warnings, and failures.
@@ -57,7 +64,7 @@ git submodule update --init --recursive
 ```
 
 Developer checkouts use the pinned submodule for sequence annotation and VCEP
-lookup. Clean plugin installations can, after explicit user approval, fetch and
+lookup. Clean installations can, after explicit user approval, fetch and
 verify the same immutable MIT-licensed commit into a non-clinical local cache.
 No case or variant data is included in that setup request.
 
