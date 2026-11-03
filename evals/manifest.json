@@ -114,6 +114,12 @@
       "skill": "plugin-packaging",
       "input": "fixtures/PACKAGE-001-gui-installation.input.json",
       "expected": "fixtures/PACKAGE-001-gui-installation.expected.json"
+    },
+    {
+      "id": "PACKAGE-002-workbuddy-expert",
+      "skill": "plugin-packaging",
+      "input": "fixtures/PACKAGE-002-workbuddy-expert.input.json",
+      "expected": "fixtures/PACKAGE-002-workbuddy-expert.expected.json"
     }
   ]
 }

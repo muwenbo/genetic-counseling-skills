@@ -25,6 +25,10 @@ scoring implementations, or clinical case storage.
 rare-disease-genetic-counseling/
 ├── .codex-plugin/plugin.json
 ├── .claude-plugin/plugin.json
+├── .codebuddy-plugin/plugin.json    # WorkBuddy open-platform expert manifest
+├── agents/
+│   └── rare-disease-genetic-counselor.md  # expert role prompt routing to skills
+├── avatars/expert.png
 ├── skills/
 │   ├── prepare-rare-disease-case/
 │   ├── review-variant-table/
@@ -60,6 +64,18 @@ The repository currently includes Codex metadata in
 metadata in `.claude-plugin/plugin.json` and the repository-level
 `.claude-plugin/marketplace.json`. Other compatible agents can consume the same
 skill directories without duplicating the clinical workflows or guardrails.
+
+WorkBuddy reads `.claude-plugin/` for ordinary plugin installation. Listing in
+the WorkBuddy expert marketplace additionally requires an open-platform expert
+package (<https://open.workbuddy.cn/docs/expert>): `.codebuddy-plugin/plugin.json`
+with the expert fields, a role prompt in `agents/`, and a 512×512 avatar in
+`avatars/`. The role prompt routes each request to the shared skills and
+restates the correctness and privacy boundaries; it does not copy skill
+workflows. The platform assigns tools, so the agent front matter declares none.
+`scripts/package_workbuddy_expert.py` checks the known platform rules and
+builds `dist/<name>-<version>.zip` with a single plugin-named root, excluding the
+other platforms' manifests. Bump `version` in every manifest for each release;
+installed plugins are cached by version. Upload remains a manual, reviewed step.
 
 Skills call the documented scientific REST APIs through small bundled clients.
 The public skill collection does not depend on Noxia or another clinical record

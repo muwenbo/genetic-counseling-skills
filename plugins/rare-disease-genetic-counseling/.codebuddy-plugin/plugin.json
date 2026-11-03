@@ -1,0 +1,81 @@
+{
+  "name": "rare-disease-genetic-counseling",
+  "version": "0.1.0",
+  "description": "Review-centered decision support for rare-disease constitutional and germline genetic counseling.",
+  "author": {
+    "name": "隐序实验室",
+    "email": "support@viknox.com"
+  },
+  "homepage": "https://github.com/muwenbo/genetic-counseling-skills",
+  "repository": "https://github.com/muwenbo/genetic-counseling-skills",
+  "license": "MIT",
+  "keywords": [
+    "rare-disease",
+    "genetics",
+    "genetic-counseling"
+  ],
+  "agents": [
+    "./agents/rare-disease-genetic-counselor.md"
+  ],
+  "skills": [
+    "./skills/classify-cnv",
+    "./skills/classify-sequence-variant",
+    "./skills/draft-counseling-summary",
+    "./skills/draw-pedigree",
+    "./skills/filter-variant-callset",
+    "./skills/find-variant-literature",
+    "./skills/interpret-negative-or-vus",
+    "./skills/prepare-rare-disease-case",
+    "./skills/rank-disease-candidates",
+    "./skills/review-variant-table"
+  ],
+  "expertType": "agent",
+  "agentName": "rare-disease-genetic-counselor",
+  "plugin": "rare-disease-genetic-counseling",
+  "displayName": {
+    "en": "Rare Disease Genetic Counseling",
+    "zh": "罕见病遗传咨询"
+  },
+  "profession": {
+    "en": "Rare-Disease Germline Genetic Counseling Assistant",
+    "zh": "罕见病胚系遗传咨询助理"
+  },
+  "displayDescription": {
+    "en": "Structures rare-disease cases and HPO terms, reviews variant tables, proposes sequence-variant and CNV classifications, finds literature, and drafts counseling summaries. Every output is a proposal for qualified human review.",
+    "zh": "罕见病胚系遗传咨询：整理病例与HPO，复核变异表，提出变异与CNV分级建议，检索文献，起草咨询小结。"
+  },
+  "avatar": "avatars/expert.png",
+  "categoryId": "12-IndustryConsultant",
+  "tags": [
+    {
+      "en": "Rare Disease",
+      "zh": "罕见病"
+    },
+    {
+      "en": "Variant Interpretation",
+      "zh": "变异解读"
+    },
+    {
+      "en": "Genetic Counseling",
+      "zh": "遗传咨询"
+    }
+  ],
+  "quickPrompts": [
+    {
+      "en": "Help me structure a rare-disease case and propose HPO terms",
+      "zh": "帮我整理罕见病病例并提出 HPO 术语建议"
+    },
+    {
+      "en": "Review the variant table from a testing company",
+      "zh": "复核检测公司提供的变异表"
+    },
+    {
+      "en": "Propose an ACMG classification for a germline CNV",
+      "zh": "为一个胚系 CNV 提出 ACMG 分级建议"
+    }
+  ],
+  "defaultInitPrompt": {
+    "en": "Help me structure a rare-disease case and propose HPO terms",
+    "zh": "帮我整理罕见病病例并提出 HPO 术语建议"
+  }
+}

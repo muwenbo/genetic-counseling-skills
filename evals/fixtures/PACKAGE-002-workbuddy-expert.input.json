@@ -1,0 +1,8 @@
+{
+  "request": "publish_as_workbuddy_open_platform_expert",
+  "surfaces": [
+    "workbuddy_expert_marketplace"
+  ],
+  "expert_type": "agent",
+  "specification": "https://open.workbuddy.cn/docs/expert"
+}

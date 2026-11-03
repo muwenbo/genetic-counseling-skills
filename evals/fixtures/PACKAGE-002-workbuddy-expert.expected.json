@@ -1,0 +1,29 @@
+{
+  "plugin_name": "rare-disease-genetic-counseling",
+  "manifest": "plugins/rare-disease-genetic-counseling/.codebuddy-plugin/plugin.json",
+  "agent_name": "rare-disease-genetic-counselor",
+  "packaging_script": "scripts/package_workbuddy_expert.py",
+  "validation_errors": [],
+  "skill_path_format": "./skills/<name>",
+  "skills_list_every_bundled_skill": true,
+  "archive_root": "rare-disease-genetic-counseling",
+  "archive_excludes": [
+    ".claude-plugin",
+    ".codex-plugin",
+    ".DS_Store",
+    "__pycache__"
+  ],
+  "agent_prompt_must_state": [
+    "reviewable proposal",
+    "explicit genome build",
+    "capability failure",
+    "Keep raw narrative local"
+  ],
+  "must_not": [
+    "declare tools in the agent front matter",
+    "list the skills parent directory instead of each skill",
+    "copy skill workflows into the agent prompt instead of routing to the skills",
+    "ship a second platform manifest inside the expert archive",
+    "present the expert as diagnosing or signing reports"
+  ]
+}

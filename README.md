@@ -72,6 +72,19 @@ The knowledge-graph skills use `https://rdkg.viknox.com.cn`. Chinese or
 mixed-language findings are translated locally into minimized English phrases
 before HPO search; raw narratives and identifiers are not sent.
 
+## WorkBuddy expert package
+
+To publish the collection as an expert on the WorkBuddy open platform, validate
+and build the upload archive:
+
+```bash
+python3 scripts/package_workbuddy_expert.py
+```
+
+The archive is written to `dist/`. Replace the placeholder avatar at
+`plugins/rare-disease-genetic-counseling/avatars/expert.png` with final 512×512
+artwork before submission.
+
 ## Architecture and validation
 
 - `docs/architecture.md` — component boundaries and integration policy

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
 from pathlib import Path
 
@@ -13,6 +14,13 @@ ROOT = Path(__file__).resolve().parent
 def load(path: Path) -> dict:
     with path.open(encoding="utf-8") as handle:
         return json.load(handle)
+
+
+def _load_module(name: str, path: Path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def main() -> None:
@@ -334,6 +342,34 @@ def main() -> None:
     assert (
         "claim Claude compatibility without a Claude marketplace manifest"
         in package_expected["must_not"]
+    )
+
+    _expert_input, expert_expected = loaded["PACKAGE-002-workbuddy-expert"]
+    packager = _load_module(
+        "package_workbuddy_expert",
+        repository_root / expert_expected["packaging_script"],
+    )
+    plugin_root = repository_root / "plugins" / expert_expected["plugin_name"]
+    assert packager.validate(plugin_root) == expert_expected["validation_errors"]
+    expert_manifest = load(repository_root / expert_expected["manifest"])
+    assert expert_manifest["name"] == expert_expected["plugin_name"]
+    assert expert_manifest["agentName"] == expert_expected["agent_name"]
+    assert expert_expected["skill_path_format"] == "./skills/<name>"
+    assert set(expert_expected["archive_excludes"]) <= packager.EXCLUDED_NAMES
+    agent_text = (
+        plugin_root / "agents" / f"{expert_expected['agent_name']}.md"
+    ).read_text(encoding="utf-8")
+    for phrase in expert_expected["agent_prompt_must_state"]:
+        assert phrase in agent_text, f"agent prompt must state: {phrase}"
+    skill_names = sorted(
+        path.name for path in (plugin_root / "skills").iterdir() if path.is_dir()
+    )
+    for skill_name in skill_names:
+        assert f"`{skill_name}`" in agent_text, f"agent prompt must route to {skill_name}"
+    assert expert_expected["skills_list_every_bundled_skill"] is True
+    assert expert_manifest["skills"] == [f"./skills/{name}" for name in skill_names]
+    assert (
+        "declare tools in the agent front matter" in expert_expected["must_not"]
     )
 
     print(f"Validated {len(fixtures)} independent fixtures.")

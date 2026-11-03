@@ -58,6 +58,18 @@ git submodule update --init --recursive
 本地翻译为经过语义核对的精简英文短语，再用于 HPO 检索；原始病例叙述和身份标识
 不会被发送。
 
+## WorkBuddy 专家包
+
+如需将本技能集作为专家发布到 WorkBuddy 开放平台，请先校验并生成上传包：
+
+```bash
+python3 scripts/package_workbuddy_expert.py
+```
+
+上传包会写入 `dist/`。提交前请将
+`plugins/rare-disease-genetic-counseling/avatars/expert.png` 中的占位头像替换为
+最终的 512×512 图片。
+
 ## 架构与验证
 
 - `docs/architecture.md` — 组件边界与集成策略
